@@ -1,0 +1,13 @@
+flask
+line-bot-sdk==1.18.0
+gunicorn
+Flask-SQLAlchemy
+Werkzeug
+python-dotenv
+Flask-Login
+Flask-Mail
+WTForms
+SQLAlchemy
+flask_wtf
+psycopg2
+email-validator
