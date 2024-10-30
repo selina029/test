@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>新增產品</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.5/cropper.min.css">
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+    
+        html, body {
+          background-color: rgb(250, 250, 250);
+          color: rgb(70, 70, 70);
+          font-family: "Microsoft JhengHei";
+          font-size: 1rem;
+        }
+        button {
+          cursor: pointer;
+          background-color: unset;
+          border: 1px solid #ddd; /* 按鈕邊框 */
+          border-radius: 8px;
+          padding: 5px 10px; /* 按鈕內邊距 */
+        }
+        
+        button.light {
+          color: rgb(93, 93, 93);
+          font-size: 1rem;
+        }
+        #_main_menu {
+          width: 200px;
+          background-color: #40698b;
+          height: 100vh; /* 讓側邊欄覆蓋整個視口高度 */
+          box-shadow: 2px 0px 8px 0 rgba(0, 0, 0, 0.04);
+          position: fixed;
+          top: 0; /* 從視口的最上面開始 */
+          left: 0;
+          z-index: 1000; /* 確保側邊欄層級高於頂部選單 */
+        }
+        #_main_menu.active {
+            left: 0; /* 顯示側邊選單 */
+        }
+        #_main_menu ul {
+          margin: 0 15px;
+          padding-top: 30px;
+          list-style-type: none;
+        }
+    
+        #_main_menu ul li {
+          padding: 0 15px;
+          font-size: 1.1rem;
+          margin-bottom: 15px;
+        }
+    
+        #_main_menu ul li a {
+          color: white;
+          display: block;
+          padding: 10px;
+          border-radius: 4px;
+          transition: background-color 0.3s;
+          text-decoration: none;
+        }
+    
+        #_main_menu ul li a:hover {
+          background-color: #305c7c;
+        }
+        #_top_menu, .top_menu {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 500;
+        }
+        
+        #_top_menu ._container, .top_menu .container {
+          width: 100%;
+          min-height: 50px;
+          background-color: white;
+          display: flex;
+          justify-content: flex-end;
+          position: relative; /* 讓三條線按鈕能相對於這個容器定位 */
+        }
+
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #40698b; /* 按鈕背景色 */
+            color: white; /* 按鈕文字顏色 */
+            padding: 10px 15px;
+            border: none;
+            position: absolute;
+            left: 15px; /* 距離左邊 15px */
+            top: 50%; /* 垂直置中 */
+            transform: translateY(-50%); /* 垂直置中對齊 */
+            z-index: 1100; /* 確保按鈕在頂部選單之上 */
+            display: none; /* 默認不顯示 */
+        }
+        #_top_menu ._container .content, .top_menu .container .content {
+          padding: 0 15px;
+          min-height: 50px;
+          box-shadow: 10px 2px 8px 0 rgba(0, 0, 0, 0.06);
+          margin-left: auto;
+        }
+        /* 手機視圖下隱藏側邊欄預留空間 */
+        @media (max-width: 1024px) {
+            .openbtn {
+                display: block; /* 顯示三條線按鈕 */
+            }
+            #_main_menu {
+              left: -200px;
+              transition: left 0.3s;
+            }
+       
+            #_main_menu.active {
+                left: 0; /* 顯示側邊選單 */
+            }
+            #_main_content {
+                margin-left: 0 !important; /* 確保強制移除預留空間 */
+            }
+        }
+
+
+        /* 表單容器 */
+        .form-container {
+            width: 80%; /* 調整表單寬度 */
+            max-width: 800px; /* 調整最大寬度 */
+            margin: 0 auto; /* 置中表單 */
+            border-radius: 10px;
+            background-color: white;
+            padding: 20px; /* 增加內邊距 */
+        }
+        
+        /* 表單標題 */
+        h2 {
+            text-align: center; /* 置中標題 */
+            margin-bottom: 20px; /* 增加標題下方的間距 */
+        }
+
+
+        /* 表單標籤 */
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        /* 表單輸入 */
+        form input[type="text"],
+        form input[type="number"],
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        /* 提交按鈕 */
+        form input[type="submit"] {
+            background-color: #40698b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #305c7c;
+        }
+
+        .img_box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            overflow-y: scroll;
+            max-height: 400px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .img_box {
+                max-height: 50vh;
+            }
+        }
+
+        .img_box img {
+            width: 100%;
+        }
+
+        .img_box .items {
+            width: calc((100% - 60px) / 3);
+            text-align: center;
+        }
+        .img_box .items img {
+            max-width: 100%; /* 調整圖片寬度 */
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 640px) {
+            .img_box .items {
+                width: calc((100% - 30px) / 2);
+            }
+        }
+
+        .img_box .items .btn {
+            margin-top: 15px;
+        }
+
+        .img_box .items .btn button {
+            border: 1px solid rgb(215, 215, 215);
+            border-radius: 3px;
+            line-height: 15px;
+        }
+
+        .img_box .items .btn button.delete {
+            background-color: rgb(204, 75, 75);
+            color: white;
+        }
+
+        .add_img_box {
+            margin-top: 50px;
+            border: 2px dashed rgb(195, 195, 195);
+            padding: 30px 15px;
+            text-align: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        #cropper-controls {
+            margin-top: 10px;
+            text-align: center;
+            width: 300px;
+            height: 300px;
+            border: 2px solid #ddd;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #cropper-image {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        #cropped-image-preview {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 5px;
+            object-fit: contain;
+        }
+
+        #images-preview img {
+            max-width: 150px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .cropper-crop-box {
+            border: 2px solid #39f !important; /* 確保裁剪框的邊框顯示為藍色 */
+        }
+        
+        .cropper-view-box {
+            border: 2px solid #39f !important; /* 確保顯示框的邊框顯示為藍色 */
+        }
+        /* 修正裁剪框顯示問題 */
+        .cropper-crop-box,
+        .cropper-view-box {
+            position: absolute;
+            border: 2px solid #39f;
+        }
+        /* 主要內容 */
+        #_main_content {
+          margin-left: 200px; /* 側邊欄的寬度 */
+          margin-top: 50px; /* 顯示頂部選單 */
+          padding: 15px;
+          flex: 1;
+          background-color: white;
+          height: calc(100vh - 50px); /* 高度為整個視口高度減去頂部選單高度 */
+          overflow-y: auto;
+        }        
+        #_main_content .container {
+          width: calc(100% - 30px);
+          margin: 15px auto 0 auto;
+          border-radius: 10px 10px 0 0;
+          background-color: white;
+          padding: 15px 15px 80px;
+        }
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .dialog {
+            background: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .dialog button {
+            padding: 10px 20px;
+            background: #596688;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .buttons button.disabled {
+            background-color: grey;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .dialog p {
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+  <div id="_top_menu">
+    <div class="_container">
+      <button class="openbtn" onclick="toggleMenu()">☰</button>
+      <span class="admin-info">{{ session['username'] if session.get('username') else '管理者帳號' }}</span>
+      <a href="{{ url_for('manager_logout') }}">
+        <button class="logout-btn">登出</button>
+      </a>
+    </div>
+  </div>
+  <div class="flex overflow-y-hidden">
+    <!-- common menu -->
+    <div id="_main_menu" class="_main_menu">
+      <ul>
+        <li><a href="/home">首頁</a></li>
+        <li><a href="/orders">訂單管理</a></li>
+        <li><a href="/products">商品設定</a></li>
+      </ul>
+    </div>
+        <div id="_main_content" class="y-scroll">
+            <div id="_navigation"></div>
+            <main class="content-wrapper">
+                <h2>新增產品</h2>
+                <form action="{{ url_for('add_product') }}" method="post" enctype="multipart/form-data" id="productForm">
+                    <label for="name">名稱:</label>
+                    <input type="text" id="ProductName" name="ProductName"><span class="error-message" id="name-error"></span><br><br>
+                    
+                    <label for="quantity">數量:</label>
+                    <input type="number" id="Quantity" name="Quantity"><span class="error-message" id="quantity-error"></span><br><br>
+                    
+                    <label for="price">價格:</label>
+                    <input type="text" id="Price" name="Price"><span class="error-message" id="price-error"></span><br><br>
+                
+                    <label for="ingredients">成分:</label>
+                    <textarea id="Ingredients" name="Ingredients"></textarea><span class="error-message" id="ingredients-error"></span><br><br>
+                
+                    <label for="origin">產地:</label>
+                    <input type="text" id="Origin" name="Origin"><br><br>
+                
+                    <label for="notes">備註:</label>
+                    <textarea id="Notes" name="Notes"></textarea><br><br>
+                
+                    <label for="images">上傳圖片:</label>
+                    <input type="file" id="images" name="images" multiple><br><br>
+                
+                    <div id="images-preview"></div><br><br>
+                
+                    <input type="submit" value="提交">
+                </form>
+                <div id="img_box" class="img_box"></div>
+        
+                <!-- 圖片裁剪模態框 -->
+                <div id="cropperModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeCropperModal()">&times;</span>
+                        <h3>預覽圖片</h3>
+                        <div id="cropper-controls">
+                            <img id="cropper-image" src="" alt="圖片裁剪區域">
+                        </div>
+                        <button id="cropImageBtn">預覽圖片</button>
+                    </div>
+                </div>
+                <div id="customDialog" class="dialog-overlay" style="display: none;">
+                    <div class="dialog">
+                        <p id="dialogMessage"></p>
+                        <button onclick="closeDialog()">關閉</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://unpkg.com/cropperjs@1.6.5/dist/cropper.min.js"></script>
+    <script>
+        document.querySelector('.openbtn').addEventListener('click', function() {
+            document.getElementById('_main_menu').classList.toggle('active');
+        });
+        
+        function showDialog(message) {
+            console.log('Dialog triggered with message:', message);
+            document.getElementById('dialogMessage').innerText = message;
+            document.getElementById('customDialog').style.display = 'flex';  // 使用 'flex' 使對話框可見
+        }
+        
+        function closeDialog() {
+            document.getElementById('customDialog').style.display = 'none';  // 隱藏對話框
+            clearFormAndPreview();  // 清除表單和預覽圖片
+        }
+        
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();  // 防止表單提交的默認行為
+        
+            const formData = new FormData(this);
+        
+            fetch('{{ url_for("add_product") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.success) {
+                    showDialog(data.message);  // 顯示成功提示
+                } else {
+                    showDialog('更新失敗: ' + data.message);  // 顯示錯誤提示
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showDialog('發生錯誤');  // 顯示發生錯誤提示
+            });
+        });
+        
+        function clearFormAndPreview() {
+            const form = document.querySelector('form');  // 獲取表單
+            form.reset();  // 重置表單
+        
+            const previewContainer = document.getElementById('images-preview');  // 獲取預覽容器
+            previewContainer.innerHTML = '';  // 清空預覽圖片，但保持容器可見
+        }
+        
+        function closeCropperModal() {
+            document.getElementById('cropperModal').style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form');
+            const nameInput = document.getElementById('ProductName');
+            const quantityInput = document.getElementById('Quantity');
+            const priceInput = document.getElementById('Price');
+            const ingredientsInput = document.getElementById('Ingredients');
+
+    
+            form.addEventListener('submit', (e) => {
+                e.preventDefault(); // 防止默認表單提交行為
+            
+                let valid = true;
+            
+                if (!nameInput.value.trim() || nameInput.value.trim().length < 2) {
+                    showDialog('產品名稱不得少於 2 個字符！');
+                    nameInput.focus();
+                    valid = false;
+                    return; // 驗證失敗，終止後續驗證
+                }
+            
+                if (!quantityInput.value.trim() || isNaN(quantityInput.value) || quantityInput.value <= 0) {
+                    showDialog('數量必須是有效的正整數！');
+                    quantityInput.focus();
+                    valid = false;
+                }
+                if (!valid) return; // 當名稱驗證失敗時立即停止後續驗證
+            
+                if (priceInput.value.trim() && !/^\d+(\.\d{0,2})?$/.test(priceInput.value)) {
+                    showDialog('價格格式不正確，請輸入有效的價格（例如：100 或 100.00）。');
+                    priceInput.focus();
+                    valid = false;
+                }
+                if (!valid) return; // 當價格驗證失敗時立即停止後續驗證
+            
+                if (!ingredientsInput.value.trim()) {
+                    showDialog('成分欄位不得為空！');
+                    ingredientsInput.focus();
+                    valid = false;
+                }
+                if (!valid) return; // 當名稱驗證失敗時立即停止後續驗證
+            
+                if (valid) {
+                    // 禁用提交按鈕以防止重複提交
+                    const submitButton = document.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+            
+                    const formData = new FormData(form);
+            
+                    fetch('{{ url_for("add_product") }}', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        if (data.success) {
+                            showDialog(data.message);  // 顯示成功訊息
+                        } else {
+                            showDialog('更新失敗: ' + data.message);  // 顯示錯誤訊息
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showDialog('發生錯誤');  // 顯示發生錯誤訊息
+                    })
+                    .finally(() => {
+                        // 提交完成後恢復按鈕狀態
+                        submitButton.disabled = false;
+                    });
+                }
+            });
+            // 預覽上傳的圖片
+            const imagesInput = document.getElementById('images');
+            const previewContainer = document.getElementById('images-preview');
+
+            imagesInput.addEventListener('change', () => {
+                previewContainer.innerHTML = '';
+                const files = imagesInput.files;
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+
+    </script>
+</body>
+</html>
