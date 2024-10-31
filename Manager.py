@@ -292,9 +292,9 @@ def login_redirect():
 
 def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_token):
     filename = secure_filename(file.filename)
-    file_path = f"static/uploads/{filename}"  # 更新路徑
+    file_path = f"static/uploads/{filename}"  # 更新為 test/static/uploads
 
-    # 將檔案內容編碼為 Base64
+    # 編碼圖片內容為 Base64
     encoded_image = base64.b64encode(file.read()).decode('utf-8')
 
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
@@ -317,7 +317,6 @@ def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_t
         print(f"GitHub API error: {response.status_code} - {response.text}")
         return False
 
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -331,21 +330,27 @@ def upload_file():
         return redirect(request.url)
     
     if file and allowed_file(file.filename):
+        # 使用 secure_filename 確保檔名安全
+        filename = secure_filename(file.filename)
+        
         # 從環境變數獲取 GitHub token
         github_token = os.getenv("GITHUB_TOKEN")
+        if not github_token:
+            flash('GitHub token 未設定', 'error')
+            return redirect(request.url)
 
         # 上傳檔案到 GitHub
         github_upload_success = upload_image_to_github(
             repo_owner="selina029",
             repo_name="test",
             file=file,
-            commit_message=f"Upload {file.filename} to static/uploads folder",  # 更新描述
+            commit_message=f"Upload {filename} to static/uploads folder",
             github_token=github_token
         )
         
         if github_upload_success:
             flash('檔案成功上傳到 GitHub', 'success')
-            return redirect(url_for('uploaded_file', filename=file.filename))
+            return redirect(url_for('uploaded_file', filename=filename))
         else:
             flash('檔案上傳到 GitHub 失敗', 'error')
             return redirect(request.url)
@@ -353,10 +358,16 @@ def upload_file():
     flash('檔案格式不允許', 'error')
     return redirect(request.url)
 
-
+# 更新的 uploaded_file route
 @app.route('/uploaded/<filename>')
 def uploaded_file(filename):
-    return redirect(url_for('static', filename=f'uploads/{filename}'))
+    # 確保檔案存在於指定路徑
+    file_path = f'uploads/{filename}'
+    if os.path.exists(os.path.join('static', file_path)):
+        return redirect(url_for('static', filename=file_path))
+    else:
+        flash('檔案未找到', 'error')
+        return redirect(url_for('upload'))
 
 @app.route('/manager_login', methods=['GET', 'POST'])
 def manager_login():
@@ -874,13 +885,6 @@ def update_product(product_id):
     
 @app.route('/upload_image/<int:product_id>', methods=['POST'])
 def upload_image(product_id):
-    # 查詢產品
-    product = Product.query.get(product_id)
-    if not product:
-        flash('產品未找到', 'error')
-        return redirect(url_for('product_edit', product_id=product_id))
-    
-    # 檢查是否有選擇圖片
     if 'image' not in request.files:
         flash('沒有選擇圖片', 'error')
         return redirect(url_for('product_edit', product_id=product_id))
@@ -890,32 +894,24 @@ def upload_image(product_id):
         flash('沒有選擇圖片', 'error')
         return redirect(url_for('product_edit', product_id=product_id))
     
-    try:
-        filename = secure_filename(image.filename)
-        
-        # 從環境變數獲取 GitHub token
-        github_token = os.getenv("GITHUB_TOKEN")
+    github_token = os.getenv("GITHUB_TOKEN")
+    if not github_token:
+        flash('GitHub token 未設定', 'error')
+        return redirect(url_for('product_edit', product_id=product_id))
 
-        # 上傳圖片到 GitHub
-        github_upload_success = upload_image_to_github(
-            repo_owner="selina029",
-            repo_name="test",
-            file=image,
-            commit_message=f"Upload {filename} for product {product_id}",
-            github_token=github_token
-        )
-        
-        if github_upload_success:
-            # 若上傳成功，儲存資料庫記錄
-            new_image = ProductImage(ProductID=product.ProductID, ImagePath=filename)
-            db.session.add(new_image)
-            db.session.commit()
-            flash('圖片成功上傳到 GitHub', 'success')
-        else:
-            flash('圖片上傳到 GitHub 失敗', 'error')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'上傳圖片時發生錯誤: {str(e)}', 'error')
+    # 上傳圖片到 GitHub
+    success = upload_image_to_github(
+        repo_owner="selina029",
+        repo_name="test",
+        file=image,
+        commit_message=f"Upload {image.filename} to test/static/uploads",
+        github_token=github_token
+    )
+    
+    if success:
+        flash('圖片上傳成功', 'success')
+    else:
+        flash('圖片上傳到 GitHub 失敗', 'error')
     
     return redirect(url_for('product_edit', product_id=product_id))
 
@@ -949,62 +945,59 @@ def product_edit(product_id):
 def delete_image_from_github(repo_owner, repo_name, file_path, commit_message, github_token):
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
 
-    # 取得檔案的 SHA 值
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
+
+    # 獲取 sha 值以便刪除
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
-        sha = response.json()['sha']
+        sha = response.json()["sha"]
     else:
-        print(f"無法找到檔案 SHA: {response.status_code} - {response.text}")
+        print(f"GitHub API error (fetch sha): {response.status_code} - {response.text}")
         return False
 
-    # 發送刪除請求
     payload = {
         "message": commit_message,
         "sha": sha
     }
-    delete_response = requests.delete(api_url, json=payload, headers=headers)
 
-    return delete_response.status_code == 200
+    response = requests.delete(api_url, json=payload, headers=headers)
+
+    if response.status_code == 200:
+        return True
+    else:
+        print(f"GitHub API error (delete): {response.status_code} - {response.text}")
+        return False
 
 @app.route('/delete_image/<int:image_id>', methods=['POST'])
 def delete_image(image_id):
-    # 查找指定的圖片
     image = ProductImage.query.get(image_id)
-    
     if image is None:
         flash('圖片未找到', 'error')
-        return redirect(url_for('product_edit', product_id=image.ProductID))  # 假設 product_edit 路由需要 product_id 參數
+        return redirect(url_for('product_edit', product_id=image.ProductID))
     
-    try:
-        # 從環境變數獲取 GitHub token
-        github_token = os.getenv("GITHUB_TOKEN")
+    github_token = os.getenv("GITHUB_TOKEN")
+    if not github_token:
+        flash('GitHub token 未設定', 'error')
+        return redirect(url_for('product_edit', product_id=image.ProductID))
 
-        # 刪除圖片檔案在 GitHub 的路徑
-        file_path = f"static/uploads/{image.ImagePath}"  # 移除 Tealounge 路徑以匹配 test repo 的結構
-        
-        # 從 GitHub 刪除圖片
-        github_delete_success = delete_image_from_github(
-            repo_owner="selina029",
-            repo_name="test",
-            file_path=file_path,
-            commit_message=f"Delete {image.ImagePath} for product {image.ProductID}",
-            github_token=github_token
-        )
-        
-        if github_delete_success:
-            # 刪除資料庫中的圖片記錄
-            db.session.delete(image)
-            db.session.commit()
-            flash('圖片已成功從 GitHub 和資料庫中刪除', 'success')
-        else:
-            flash('無法從 GitHub 刪除圖片', 'error')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'刪除圖片時發生錯誤: {str(e)}', 'error')
+    # 刪除圖片檔案
+    success = delete_image_from_github(
+        repo_owner="selina029",
+        repo_name="test",
+        file_path=f"static/uploads/{image.ImagePath}",
+        commit_message=f"Delete {image.ImagePath} from test/static/uploads",
+        github_token=github_token
+    )
+    
+    if success:
+        db.session.delete(image)
+        db.session.commit()
+        flash('圖片已刪除', 'success')
+    else:
+        flash('圖片刪除失敗', 'error')
     
     return redirect(url_for('product_edit', product_id=image.ProductID))
 
