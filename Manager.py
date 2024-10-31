@@ -292,7 +292,7 @@ def login_redirect():
 
 def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_token):
     filename = secure_filename(file.filename)
-    file_path = f"Tealounge/static/uploads/{filename}"
+    file_path = f"static/uploads/{filename}"  # 更新路徑
 
     # 將檔案內容編碼為 Base64
     encoded_image = base64.b64encode(file.read()).decode('utf-8')
@@ -317,6 +317,7 @@ def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_t
         print(f"GitHub API error: {response.status_code} - {response.text}")
         return False
 
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -338,7 +339,7 @@ def upload_file():
             repo_owner="selina029",
             repo_name="test",
             file=file,
-            commit_message=f"Upload {file.filename} to Tealounge static folder",
+            commit_message=f"Upload {file.filename} to static/uploads folder",  # 更新描述
             github_token=github_token
         )
         
@@ -351,6 +352,7 @@ def upload_file():
     
     flash('檔案格式不允許', 'error')
     return redirect(request.url)
+
 
 @app.route('/uploaded/<filename>')
 def uploaded_file(filename):
