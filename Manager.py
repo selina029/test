@@ -290,6 +290,32 @@ def login_redirect():
     return redirect(url_for('manager_login'))
 
 
+def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_token):
+    filename = secure_filename(file.filename)
+    file_path = f"Tealounge/static/uploads/{filename}"
+
+    # 將檔案內容編碼為 Base64
+    encoded_image = base64.b64encode(file.read()).decode('utf-8')
+
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+
+    payload = {
+        "message": commit_message,
+        "content": encoded_image
+    }
+
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    response = requests.put(api_url, json=payload, headers=headers)
+
+    if response.status_code == 201:
+        return True
+    else:
+        print(f"GitHub API error: {response.status_code} - {response.text}")
+        return False
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -304,10 +330,24 @@ def upload_file():
         return redirect(request.url)
     
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        flash('檔案上傳成功', 'success')
-        return redirect(url_for('uploaded_file', filename=filename))
+        # 從環境變數獲取 GitHub token
+        github_token = os.getenv("GITHUB_TOKEN")
+
+        # 上傳檔案到 GitHub
+        github_upload_success = upload_image_to_github(
+            repo_owner="selina029",
+            repo_name="Tealounge",
+            file=file,
+            commit_message=f"Upload {file.filename} to Tealounge static folder",
+            github_token=github_token
+        )
+        
+        if github_upload_success:
+            flash('檔案成功上傳到 GitHub', 'success')
+            return redirect(url_for('uploaded_file', filename=file.filename))
+        else:
+            flash('檔案上傳到 GitHub 失敗', 'error')
+            return redirect(request.url)
     
     flash('檔案格式不允許', 'error')
     return redirect(request.url)
@@ -315,7 +355,6 @@ def upload_file():
 @app.route('/uploaded/<filename>')
 def uploaded_file(filename):
     return redirect(url_for('static', filename=f'uploads/{filename}'))
-
 
 @app.route('/manager_login', methods=['GET', 'POST'])
 def manager_login():
