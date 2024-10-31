@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>關於我們</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 180px;
+            height: 70px;
+            margin-right: 20px;
+        }
+        /* Hide button in desktop */
+        .openbtn {
+            display: none;
+        }
+        
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .openbtn {
+                display: block;
+                font-size: 24px;
+                cursor: pointer;
+                background-color: #333;
+                color: white;
+                border: none;
+                padding: 10px;
+                margin-right: 10px;
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 2001; /* 保證按鈕位於最前方 */
+            }
+
+        
+            #mobileMenu {
+                position: fixed;
+                top: 0;
+                right: -250px; /* 初始隱藏 */
+                width: 250px;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9); /* 黑色半透明背景 */
+                padding-top: 60px;
+                transition: right 0.3s ease; /* 添加動畫效果 */
+                z-index: 2000; /* 確保在最上層 */
+            }
+
+            #mobileMenu ul {
+                list-style-type: none;
+                padding: 0;
+            }
+        
+            #mobileMenu ul li {
+                padding: 8px 16px;
+                text-align: left;
+            }
+        
+            #mobileMenu ul li a {
+                text-decoration: none;
+                font-size: 18px;
+                color: white;
+                display: block;
+            }
+        
+            #mobileMenu ul li a:hover {
+                background-color: #575757;
+            }
+        
+            #desktopMenu {
+                display: none; /* 隱藏桌面版導航 */
+            }
+        }
+        
+        /* 桌面版樣式 */
+        @media (min-width: 769px) {
+            .openbtn {
+                display: none; /* 桌面版隱藏按鈕 */
+            }
+        
+            #desktopMenu {
+                display: block;
+            }
+        
+            #desktopMenu ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+            }
+        
+            #desktopMenu ul li {
+                margin-right: 20px;
+            }
+        
+            #desktopMenu ul li a {
+                text-decoration: none;
+                color: #333;
+                font-size: 18px;
+            }
+        }
+        .icons a {
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        .icons img {
+            width: 24px;
+            height: 24px;
+        }
+        .user-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 150px;
+            background-color: #e1e9f4;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        /* 手機版調整 */
+        @media (max-width: 768px) { /* 根據你的設計調整這個值 */
+            .user-popup {
+                top: 110px; /* 將 top 調整到一個適合的值以避免擋住圖示 */
+                right: 20px; /* 根據需求調整 */
+                width: 150px; /* 如果需要，可以保持寬度 */
+            }
+        }
+        .user-popup a {
+            display: block;
+            color: #5E6D79;
+            text-decoration: none;
+            padding: 5px 5px;
+            text-align: center;
+
+        }
+        .user-popup a:hover {
+            background-color: #E8EAE6;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #E8EAE6;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            color: #5E6D79;
+        }
+
+        .btn:hover {
+            background-color: #E8EAE6;
+        }
+        .icons img {
+            cursor: pointer;
+        }
+        .logout-button {
+            display: block;
+            width: 100px;
+            margin: 10px auto;
+            padding: 5px;
+            background-color: #d3d7e0;
+            color: #000;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        footer {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-logo h2 {
+            text-align: center;
+            color: #7cbd8b;
+        }
+        .footer-links a {
+            margin-left: 20px;
+        }
+        .footer-links img {
+            width: 24px;
+            height: 24px;
+        }
+        footer h3 {
+            margin: 10px 0 0;
+            color: #6d6d6d;
+            font-size: 13px;
+            text-align: left;
+        }
+        footer h4 {
+            margin: 10px 0 0;
+            color: #838383;
+            font-size: 12px;
+            text-align: left;
+        }
+        footer p {
+            margin: 10px 0 0;
+            color: #9b9b9b;
+            font-size: 10px;
+        }
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+            }
+        
+            /* 修改圖示排列方式 */
+            .icons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        
+            .icons a:first-child {
+                margin-left: 0; /* 保證左邊的圖示貼齊 */
+            }
+        
+            .icons a:last-child {
+                margin-right: 0; /* 保證右邊的圖示貼齊 */
+            }
+        
+        @media screen and (max-width: 768px) {
+                .products {
+                    grid-template-columns: 1fr;
+                }
+            
+            
+                nav ul {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            
+                nav ul li {
+                    margin: 10px 0;
+                }
+            
+                .menu-icon {
+                    display: block;
+                }
+            
+                .header-container {
+                    flex-direction: column;
+                }
+            
+                .icons {
+                    justify-content: space-between;
+                    width: 100%;
+                }
+            
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/logo_home.png') }}" alt="Tea Lounge Logo" class="logo"></a>
+            </div>
+            <button class="openbtn">☰</button>
+            
+            <nav id="mobileMenu" style="display: none;">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">所有商品</a></li>
+                    <li><a href="{{ url_for('group') }}">團購專區</a></li>
+                    <li><a href="{{ url_for('about') }}">關於我們</a></li>
+                    <li><a href="{{ url_for('contact') }}">訂購須知</a></li>
+                </ul>
+            </nav>
+
+            
+            <!-- Desktop navigation -->
+            <nav id="desktopMenu">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">所有商品</a></li>
+                    <li><a href="{{ url_for('group') }}">團購專區</a></li>
+                    <li><a href="{{ url_for('about') }}">關於我們</a></li>
+                    <li><a href="{{ url_for('contact') }}">訂購須知</a></li>
+                </ul>
+            </nav>
+            <div class="icons">
+                <a href="{{ url_for('cart') }}"><img src="{{ url_for('static', filename='images/cart.png') }}" alt="Cart Icon"></a>
+                {% if current_user.is_authenticated %}
+                <a onclick="toggleUserPopup()"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+            {% else %}
+                <a href="/login"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+            {% endif %}
+        </div>
+    </header>
+
+        <!-- 用戶彈出框 -->
+    <div id="userPopup" class="user-popup" style="display: none;">
+        <a href="/member">會員資料</a>
+        <a href="/order">訂單查詢</a>
+        <hr>
+        <form action="{{ url_for('logout') }}" method="post">
+            <button type="submit" class="btn">登出</button>
+        </form> 
+    </div>
+
+    <!-- 主內容 -->
+    <div class="main-content">
+        <img src="{{ url_for('static', filename='images/about.png') }}" alt="關於我們" style="width: 100%;">
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h2>Tea Lounge</h2>
+                <h3>聯絡資訊</h3>
+                <h4>
+                客服專線：0981-509-558<br>
+                信箱：rcdesign03@gmail.com</h4>
+            </div>
+            <div class="footer-links">
+                <a href="https://www.facebook.com/teacafelounge"><img src="static/images/FB.png" alt="Facebook Icon"></a>
+                <a href="https://www.instagram.com/food.is.shiny?igsh=MXZ5anJ2cmx1aHZlbw=="><img src="static/images/IG.png" alt="Instagram Icon"></a>
+                <a href="#https://lin.ee/f2KTSUE"><img src="static/images/LINE.png" alt="LINE Icon"></a>
+            </div>
+        </div>
+    </footer>
+    <script>
+       function toggleUserPopup() {
+           var popup = document.getElementById('userPopup');
+           popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+       }
+       
+       // 側邊選單控制
+       const openBtn = document.querySelector('.openbtn');
+       if (openBtn) {
+           openBtn.addEventListener('click', toggleMenu);
+       }
+   
+       function toggleMenu() {
+           var menu = document.getElementById('mobileMenu');
+           var currentRight = window.getComputedStyle(menu).right;
+       
+           if (currentRight === '0px') {
+               menu.style.right = '-250px';  // 隱藏選單
+               menu.style.display = 'none';    // 確保選單不顯示
+           } else {
+               menu.style.right = '0px';       // 顯示選單
+               menu.style.display = 'block';    // 確保選單顯示
+           }
+       }
+       
+       function logout() {
+           // 假設你有一個登出路由 /logout
+           window.location.href = '/logout';
+       }    
+    </script>
+</body>
+</html>

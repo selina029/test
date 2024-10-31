@@ -1,0 +1,743 @@
+<!DOCTYPE html> 
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員資料</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 180px;
+            height: 70px;
+            margin-right: 20px;
+        }
+        /* Hide button in desktop */
+        .openbtn {
+            display: none;
+        }
+        
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .openbtn {
+                display: block;
+                font-size: 24px;
+                cursor: pointer;
+                background-color: #333;
+                color: white;
+                border: none;
+                padding: 10px;
+                margin-right: 10px;
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 2001; /* 保證按鈕位於最前方 */
+            }
+
+        
+            #mobileMenu {
+                position: fixed;
+                top: 0;
+                right: -250px; /* 初始隱藏 */
+                width: 250px;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9); /* 黑色半透明背景 */
+                padding-top: 60px;
+                transition: right 0.3s ease; /* 添加動畫效果 */
+                z-index: 2000; /* 確保在最上層 */
+            }
+
+            #mobileMenu ul {
+                list-style-type: none;
+                padding: 0;
+            }
+        
+            #mobileMenu ul li {
+                padding: 8px 16px;
+                text-align: left;
+            }
+        
+            #mobileMenu ul li a {
+                text-decoration: none;
+                font-size: 18px;
+                color: white;
+                display: block;
+            }
+        
+            #mobileMenu ul li a:hover {
+                background-color: #575757;
+            }
+        
+            #desktopMenu {
+                display: none; /* 隱藏桌面版導航 */
+            }
+        }
+        
+        /* 桌面版樣式 */
+        @media (min-width: 769px) {
+            .openbtn {
+                display: none; /* 桌面版隱藏按鈕 */
+            }
+        
+            #desktopMenu {
+                display: block;
+            }
+        
+            #desktopMenu ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+            }
+        
+            #desktopMenu ul li {
+                margin-right: 20px;
+            }
+        
+            #desktopMenu ul li a {
+                text-decoration: none;
+                color: #333;
+                font-size: 18px;
+            }
+        }
+        .icons a {
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        .icons img {
+            width: 24px;
+            height: 24px;
+        }
+        .form-container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a4a4a;
+        }
+        .submit-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: #4a4a4a;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #333;
+        }
+        footer {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-logo h2 {
+            text-align: center;
+            color: #7cbd8b;
+        }
+        .footer-links a {
+            margin-left: 20px;
+        }
+        .footer-links img {
+            width: 24px;
+            height: 24px;
+        }
+        footer h3 {
+            margin: 10px 0 0;
+            color: #6d6d6d;
+            font-size: 13px;
+            text-align: left;
+        }
+        footer h4 {
+            margin: 10px 0 0;
+            color: #838383;
+            font-size: 12px;
+            text-align: left;
+        }
+        footer p {
+            margin: 10px 0 0;
+            color: #9b9b9b;
+            font-size: 10px;
+        }
+        .user-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 150px;
+            background-color: #e1e9f4;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        /* 手機版調整 */
+        @media (max-width: 768px) { /* 根據你的設計調整這個值 */
+            .user-popup {
+                top: 110px; /* 將 top 調整到一個適合的值以避免擋住圖示 */
+                right: 20px; /* 根據需求調整 */
+                width: 150px; /* 如果需要，可以保持寬度 */
+            }
+        }
+        .user-popup a {
+            display: block;
+            color: #5E6D79;
+            text-decoration: none;
+            padding: 5px 5px;
+            text-align: center;
+
+        }
+        .user-popup a:hover {
+            background-color: #E8EAE6;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #E8EAE6;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            color: #5E6D79;
+        }
+        .btn:hover {
+            background-color: #E8EAE6;
+        }
+        .icons img {
+            cursor: pointer;
+        }
+        .logout-button {
+            display: block;
+            width: 100px;
+            margin: 10px auto;
+            padding: 5px;
+            background-color: #d3d7e0;
+            color: #000;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        .cart-icon {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ff0000; /* 設置徽章背景顏色 */
+            color: #fff; /* 設置徽章文字顏色 */
+            border-radius: 50%;
+            width: 20px; /* 設置徽章的寬度 */
+            height: 20px; /* 設置徽章的高度 */
+            text-align: center;
+            line-height: 20px; /* 垂直居中文字 */
+            font-size: 12px; /* 設置徽章中文字的大小 */
+            font-weight: bold;
+            display: none;
+        }
+        .menu-icon {
+            display: none;
+            cursor: pointer;
+        }
+        
+       /* 通用模態框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+        
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 20px 0;
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        .modal-footer button {
+            background-color: #8ba083;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .modal-footer button:hover {
+            background-color: #64745e;
+        }
+        
+        /* 確認提交按鈕 */
+        #confirmSubmit {
+            background-color: #5a9f75;
+        }
+        
+        #confirmSubmit:hover {
+            background-color: #497a5a;
+        }
+        
+        /* 取消按鈕 */
+        #cancelSubmit {
+            background-color: #e74c3c;
+        }
+        
+        #cancelSubmit:hover {
+            background-color: #c0392b;
+        }
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+            }
+        
+            /* 修改圖示排列方式 */
+            .icons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        
+            .icons a:first-child {
+                margin-left: 0; /* 保證左邊的圖示貼齊 */
+            }
+        
+            .icons a:last-child {
+                margin-right: 0; /* 保證右邊的圖示貼齊 */
+            }
+        
+        @media screen and (max-width: 768px) {
+                .products {
+                    grid-template-columns: 1fr;
+                }
+            
+            
+                nav ul {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            
+                nav ul li {
+                    margin: 10px 0;
+                }
+            
+                .menu-icon {
+                    display: block;
+                }
+            
+                .header-container {
+                    flex-direction: column;
+                }
+            
+                .icons {
+                    justify-content: space-between;
+                    width: 100%;
+                }
+            
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/logo_home.png') }}" alt="Tea Lounge Logo" class="logo"></a>
+            </div>
+            <button class="openbtn">☰</button>
+            
+            <nav id="mobileMenu" style="display: none;">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">所有商品</a></li>
+                    <li><a href="{{ url_for('group') }}">團購專區</a></li>
+                    <li><a href="{{ url_for('about') }}">關於我們</a></li>
+                    <li><a href="{{ url_for('contact') }}">訂購須知</a></li>
+                </ul>
+            </nav>
+
+            
+            <!-- Desktop navigation -->
+            <nav id="desktopMenu">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">所有商品</a></li>
+                    <li><a href="{{ url_for('group') }}">團購專區</a></li>
+                    <li><a href="{{ url_for('about') }}">關於我們</a></li>
+                    <li><a href="{{ url_for('contact') }}">訂購須知</a></li>
+                </ul>
+            </nav>
+            <div class="icons">
+                <a href="{{ url_for('cart') }}" class="cart-icon">
+                    <img src="{{ url_for('static', filename='images/cart.png') }}" alt="Cart Icon">
+                    <span class="cart-badge" id="cart-count"></span>
+                </a>
+                {% if current_user.is_authenticated %}
+                <a onclick="toggleUserPopup()"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+            {% else %}
+                <a href="/login"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+            {% endif %}
+        </div>
+        </header>
+       
+        <!-- 用戶彈出框 -->
+        <div id="userPopup" class="user-popup" style="display: none;">
+            <a href="/member">會員資料</a>
+            <a href="/order">訂單查詢</a>
+            <hr>
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit" class="btn">登出</button>
+            </form> 
+        </div>
+        
+        <div id="errorModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">訊息</span>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="modalClose">確定</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 確認提交模態框 -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">確認提交</span>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要提交更改嗎？</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmSubmit">確定</button>
+                    <button id="cancelSubmit">取消</button>
+                </div>
+            </div>
+        </div>
+
+    
+        <div class="form-container">
+        <div class="form-header">
+            <h2>會員資料</h2>
+        </div>
+        <form id="updateForm" action="/member/update" method="POST">
+            <div class="form-group">
+                <label for="username">使用者名稱：</label>
+                <input type="text" id="username" name="username" value="{{ member.Name }}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email：</label>
+                <input type="email" id="email" name="email" value="{{ member.Email }}">
+            </div>
+            <div class="form-group">
+                <label for="phone">手機號碼：</label>
+                <input type="tel" id="phone" name="phone" value="{{ member.Phone }}">
+            </div>
+            <div class="form-group">
+                <label for="old_password">輸入舊密碼：</label>
+                <input type="password" id="old_password" name="old_password">
+            </div>
+            <div class="form-group">
+                <label for="new_password">更改密碼：</label>
+                <input type="password" id="new_password" name="new_password">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">確認更改密碼：</label>
+                <input type="password" id="confirm_password" name="confirm_password">
+            </div>
+            <button type="submit" class="submit-btn">確認</button>
+        </form>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h2>Tea Lounge</h2>
+                <h3>聯絡資訊</h3>
+                <h4>
+                客服專線：0981-509-558<br>
+                信箱：rcdesign03@gmail.com</h4>
+            </div>
+            <div class="footer-links">
+                <a href="https://www.facebook.com/teacafelounge"><img src="static/images/FB.png" alt="Facebook Icon"></a>
+                <a href="https://www.instagram.com/food.is.shiny?igsh=MXZ5anJ2cmx1aHZlbw=="><img src="static/images/IG.png" alt="Instagram Icon"></a>
+                <a href="https://lin.ee/f2KTSU"><img src="static/images/LINE.png" alt="LINE Icon"></a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateForm = document.getElementById('updateForm');
+        
+            if (updateForm) {
+                updateForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // 防止表單默認提交
+                    showConfirmModal(); // 顯示確認提交的模態框
+                });
+            }
+        
+            // 表單驗證函數
+            function validateForm() {
+                const oldPassword = document.getElementById('old_password').value;
+                const newPassword = document.getElementById('new_password').value;
+                const confirmPassword = document.getElementById('confirm_password').value;
+        
+                // 密碼正則表達式驗證：至少 8 個字符，必須包含字母和數字
+                const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        
+                // 檢查是否有填寫新密碼或確認密碼，如果有則進行驗證
+                if (newPassword || confirmPassword) {
+                    // 驗證新密碼是否符合要求
+                    if (newPassword && !newPassword.match(passwordRegex)) {
+                        showModal('新密碼必須至少包含 8 個字符，並且包含字母和數字。');
+                        return false; // 驗證失敗
+                    }
+        
+                    // 驗證新密碼與確認密碼是否一致
+                    if (newPassword !== confirmPassword) {
+                        showModal('新密碼與確認密碼不一致，請重新輸入。');
+                        return false; // 驗證失敗
+                    }
+                }
+        
+                // 驗證通過
+                return true;
+            }
+        
+            // 顯示錯誤訊息模態框的函數
+            function showModal(message, redirectOnClose = false) {
+                var modal = document.getElementById("errorModal");
+                var modalContent = document.getElementById("modalMessage");
+                modalContent.textContent = message;
+                modal.style.display = "block";
+        
+                // 點擊模態框外部或確定按鈕，關閉模態框
+                window.onclick = function(event) {
+                    if (event.target === modal || event.target.getAttribute('id') === 'modalClose') {
+                        modal.style.display = "none";
+                        if (redirectOnClose) {
+                            window.location.href = '/member'; // 更新成功後重定向
+                        }
+                    }
+                }
+            }
+        
+            // 顯示確認提交模態框
+            function showConfirmModal() {
+                var modal = document.getElementById("confirmModal");
+                modal.style.display = "block";
+        
+                // 點擊「確定」按鈕
+                document.getElementById('confirmSubmit').onclick = function() {
+                    modal.style.display = "none"; // 關閉模態框
+                    if (validateForm()) {
+                        const form = updateForm;
+                        const formData = new FormData(form);
+        
+                        // 發送表單數據
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showModal('更新成功', true); // 顯示成功訊息並重定向
+                            } else {
+                                showModal('更新失敗: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showModal('發生錯誤，請稍後重試。');
+                        });
+                    }
+                };
+        
+                // 點擊「取消」按鈕
+                document.getElementById('cancelSubmit').onclick = function() {
+                    modal.style.display = "none"; // 關閉模態框
+                };
+            }
+        });
+
+
+
+
+
+
+
+    
+        document.addEventListener("DOMContentLoaded", function() {
+            // 用戶彈出框顯示切換
+            const userPopup = document.getElementById('userPopup');
+            if (userPopup) {
+                window.toggleUserPopup = function() {
+                    userPopup.style.display = userPopup.style.display === 'none' || userPopup.style.display === '' ? 'block' : 'none';
+                };
+            }
+    
+            // 更新購物車徽章顯示
+            const cartCountElement = document.getElementById('cart-count');
+    
+            const updateCartBadge = (itemCount) => {
+                cartCountElement.textContent = itemCount > 0 ? itemCount : '';
+                cartCountElement.style.display = itemCount > 0 ? 'block' : 'none';
+            };
+    
+            const calculateCartItemCount = () => {
+                let totalQuantity = 0;
+    
+                try {
+                    // 獲取 local storage 購物車數據
+                    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    
+                    // 計算所有商品的總數量
+                    cart.forEach(item => {
+                        if (item.quantity) {
+                            totalQuantity += item.quantity;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error parsing cart data from local storage:', error);
+                }
+    
+                return totalQuantity;
+            };
+    
+            // 計算購物車數量並更新徽章
+            const itemCount = calculateCartItemCount();
+            updateCartBadge(itemCount);
+        });
+        
+        // 側邊選單控制
+        const openBtn = document.querySelector('.openbtn');
+        if (openBtn) {
+            openBtn.addEventListener('click', toggleMenu);
+        }
+    
+        function toggleMenu() {
+            var menu = document.getElementById('mobileMenu');
+            var currentRight = window.getComputedStyle(menu).right;
+        
+            if (currentRight === '0px') {
+                menu.style.right = '-250px';  // 隱藏選單
+                menu.style.display = 'none';    // 確保選單不顯示
+            } else {
+                menu.style.right = '0px';       // 顯示選單
+                menu.style.display = 'block';    // 確保選單顯示
+            }
+        }
+        
+        function logout() {
+            // 假設你有一個登出路由 /logout
+            window.location.href = '/logout';
+        }
+    </script>
+
+</body>
+</html>

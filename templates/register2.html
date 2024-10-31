@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>註冊</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 自定義 CSS -->
+    <style>
+        body {
+            background-color: #6B886D;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: #D9E2D0;
+            padding: 20px;
+        }
+        .card-title {
+            color: #333;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        .btn-primary {
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #6B886D;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #4a634b;
+        }
+        .btn-line {
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #00b900;
+            border: none;
+            color: white;
+        }
+        .btn-line:hover {
+            background-color: #009900;
+        }
+        .links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .links a {
+            color: #007bff;
+        }
+        .links a:hover {
+            text-decoration: none;
+            color: #0056b3;
+        }
+        
+        /* 通用模態框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+        
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 20px 0;
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        .modal-footer button {
+            background-color: #8ba083;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .modal-footer button:hover {
+            background-color: #64745e;
+        }
+        
+        /* 確認提交按鈕 */
+        #confirmSubmit {
+            background-color: #5a9f75;
+        }
+        
+        #confirmSubmit:hover {
+            background-color: #497a5a;
+        }
+        
+        /* 取消按鈕 */
+        #cancelSubmit {
+            background-color: #e74c3c;
+        }
+        
+        #cancelSubmit:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 密碼驗證錯誤訊息模態框 -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">錯誤</span>
+            </div>
+            <div class="modal-body">
+                <p id="errorMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalClose">確定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 確認提交模態框 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">確認提交</span>
+            </div>
+            <div class="modal-body">
+                <p>您確定要提交表單嗎？</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmSubmit">確定</button>
+                <button id="cancelSubmit">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title">註冊</h1>
+                        <form id="registerForm" method="POST" action="{{ url_for('register') }}">
+                            {{ form.hidden_tag() }}
+                            <input type="hidden" name="user_id" value="{{ user_id }}"> <!-- 添加這一行 -->
+                            <div class="form-group">
+                                <label for="name">姓名：</label>
+                                {{ form.name(class="form-control", placeholder="請輸入您的姓名") }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email：</label>
+                                {{ form.email(class="form-control", placeholder="請輸入您的Email") }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">手機號碼：</label>
+                                {{ form.phone(class="form-control", placeholder="請輸入您的手機號碼") }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="birthday">生日：</label>
+                                {{ form.birthday(class="form-control", placeholder="YYYY-MM-DD") }}
+                                {% if form.birthday.errors %}
+                                    <div class="text-danger">{{ form.birthday.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="password">密碼：</label>
+                                {{ form.password(class="form-control", placeholder="請輸入至少8位數字和英文字母的密碼") }}
+                                {% if form.password.errors %}
+                                    <div class="text-danger">{{ form.password.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="pass_confirm">確認密碼：</label>
+                                {{ form.pass_confirm(class="form-control", placeholder="請輸入確認密碼") }}
+                                {% if form.pass_confirm.errors %}
+                                    <div class="text-danger">{{ form.pass_confirm.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <hr>
+                            <button type="submit" id="submit" class="btn btn-primary btn-block">立即註冊</button>
+                        </form>
+                        <div class="links">
+                            <a href="/login">已有帳號 立即登入</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 Bootstrap JS 和 jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function validateForm(event) {
+                const password = document.getElementById('password').value;
+                const pass_confirm = document.getElementById('pass_confirm').value;
+                
+                // 密碼驗證: 至少8位數字和英文字母
+                const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$/; // 至少8位數字和英文字母
+                if (!passwordPattern.test(password)) {
+                    showErrorModal('密碼必須至少包含8位數字和英文字母。');
+                    event.preventDefault(); // 阻止表單提交
+                    return false;
+                }
+        
+                if (password !== pass_confirm) {
+                    showErrorModal('密碼和確認密碼不一致，請重新輸入。');
+                    event.preventDefault(); // 阻止表單提交
+                    return false;
+                }
+        
+                // 顯示確認模態框
+                showConfirmModal(event);
+                return false; // 阻止表單提交，待確認後再提交
+            }
+        
+            // 顯示錯誤模態框
+            function showErrorModal(message) {
+                var modal = document.getElementById("errorModal");
+                document.getElementById('errorMessage').innerText = message;
+                modal.style.display = "block";
+                document.getElementById('modalClose').onclick = function() {
+                    modal.style.display = "none"; // 關閉模態框
+                };
+            }
+        
+            // 顯示確認模態框
+            function showConfirmModal(event) {
+                var modal = document.getElementById("confirmModal");
+                modal.style.display = "block";
+            
+                // 點擊「確定」按鈕
+                document.getElementById('confirmSubmit').onclick = function() {
+                    modal.style.display = "none"; // 關閉模態框
+                    // 提交表單
+                    document.getElementById('registerForm').submit(); 
+                };
+            
+                // 點擊「取消」按鈕
+                document.getElementById('cancelSubmit').onclick = function() {
+                    modal.style.display = "none"; // 關閉模態框
+                    // 不提交表單
+                    event.preventDefault(); 
+                };
+            }
+        
+            // 註冊按鈕點擊事件
+            document.getElementById('registerForm').addEventListener('submit', validateForm);
+            // 生日輸入框格式化
+            document.getElementById('birthday').addEventListener('input', formatBirthday);
+        });
+    </script>
+
+</body>
+</html>

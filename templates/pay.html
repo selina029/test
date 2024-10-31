@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tea Lounge</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 180px;
+            height: 70px;
+            margin-right: 20px;
+        }
+        .icons a {
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        .icons img {
+            width: 24px;
+            height: 24px;
+        }
+        .container {
+            padding: 20px;
+            max-width: 1000px; /* 调整最大宽度以适应并排布局 */
+            margin: 0 auto;
+        }
+        .form-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .section {
+            background-color: #eef3fc;
+            border: 2px solid #a0b8d1;
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            flex: 1; /* 使 section 自适应宽度 */
+            margin-right: 10px; /* 添加右边距以分隔两个 section */
+        }
+        .section:last-child {
+            margin-right: 0; /* 移除最后一个 section 的右边距 */
+        }
+        .cart-info {
+            width: 100%;
+        }
+       .bottom-sections {
+            display: flex;
+            justify-content: space-between;
+        }
+        .pricing-info {
+            max-width: 45%; /* 限制 section 最大宽度，适应页面布局 */
+        }
+       
+        .payment-info {
+            max-width: 45%; /* 限制 section 最大宽度，适应页面布局 */
+        }
+        h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .cart-items {
+            list-style: none;
+            padding: 0;
+        }
+        .cart-items li {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .pricing-info .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        .pricing-info .total {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            font-weight: bold;
+        }
+        .payment-info .bank-details .row {
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            input[type="text"] {
+                padding: 6px; /* 減小 padding 在較小螢幕上 */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            input[type="text"] {
+                padding: 5px; /* 進一步減小 padding */
+                font-size: 14px; /* 減小字體大小 */
+            }
+        }
+        .instructions {
+            font-size: 12px;
+            color: #ff0000;
+            margin: 20px auto;
+            width: 80%;
+            text-align: center;
+        }
+        .submit-section {
+            margin: 0 auto;
+            width: 30%;
+        }
+        button {
+            padding: 10px;
+            background-color: #ced4da;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #698095;
+        }
+        footer {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-logo h2 {
+            text-align: center;
+            color: #7cbd8b;
+        }
+        .footer-links a {
+            margin-left: 20px;
+        }
+        .footer-links img {
+            width: 24px;
+            height: 24px;
+        }
+        footer h3 {
+            margin: 10px 0 0;
+            color: #6d6d6d;
+            font-size: 13px;
+            text-align: left;
+        }
+        footer h4 {
+            margin: 10px 0 0;
+            color: #838383;
+            font-size: 12px;
+            text-align: left;
+        }
+        footer p {
+            margin: 10px 0 0;
+            color: #9b9b9b;
+            font-size: 10px;
+        }
+        .user-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 150px;
+            background-color: #e1e9f4;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        /* 手機版調整 */
+        @media (max-width: 768px) { /* 根據你的設計調整這個值 */
+            .user-popup {
+                top: 90px; /* 將 top 調整到一個適合的值以避免擋住圖示 */
+                right: 20px; /* 根據需求調整 */
+                width: 150px; /* 如果需要，可以保持寬度 */
+            }
+        }
+        .user-popup a {
+            display: block;
+            color: #5E6D79;
+            text-decoration: none;
+            padding: 5px 5px;
+            text-align: center;
+
+        }
+        .user-popup a:hover {
+            background-color: #E8EAE6;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #E8EAE6;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            color: #5E6D79;
+        }
+
+        .btn:hover {
+            background-color: #E8EAE6;
+        }
+
+        /* 新增：隱藏表單區域 */
+        .delivery-info {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .delivery-info input {
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
+       
+         .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+       
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+       
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+       
+        .modal-title {
+            font-size: 18px;
+            color: #333;
+        }
+       
+        .modal-body {
+            padding: 20px 0;
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+        }
+       
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+       
+        .modal-footer button {
+            background-color: #8ba083;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+       
+        .modal-footer button:hover {
+            background-color: #64745e;
+        }
+       
+        /* 確認提交按鈕 */
+        #confirmSubmit {
+            background-color: #5a9f75;
+        }
+       
+        #confirmSubmit:hover {
+            background-color: #497a5a;
+        }
+       
+        /* 取消按鈕 */
+        #cancelSubmit {
+            background-color: #e74c3c;
+        }
+       
+        #cancelSubmit:hover {
+            background-color: #c0392b;
+        }
+       
+        /* 錯誤模態框 */
+        #error-modal .modal-footer button {
+            background-color: #e74c3c;
+        }
+       
+        #error-modal .modal-footer button:hover {
+            background-color: #c0392b;
+        }
+       
+        /* 成功模態框 */
+        #success-modal .modal-footer button {
+            background-color: #5a9f75;
+        }
+       
+        #success-modal .modal-footer button:hover {
+            background-color: #497a5a;
+        }
+       
+        /* 確認模態框 */
+        #confirm-modal .modal-footer button {
+            background-color: #5a9f75;
+        }
+       
+        #confirm-modal .modal-footer button:hover {
+            background-color: #497a5a;
+        }
+        /* RWD 調整 */
+        @media (max-width: 768px) {
+            .bottom-sections {
+                flex-direction: column; /* 使底部區域垂直排列 */
+            }
+        
+            .pricing-info, .payment-info {
+                max-width: 100%; /* 限制寬度 */
+                margin-right: 0; /* 移除右邊距 */
+                margin-bottom: 20px; /* 增加底部間距 */
+            }
+        
+            .submit-section {
+                width: 100%; /* 調整提交區域寬度 */
+            }
+        
+            .modal-content {
+                width: 90%; /* 增加模態框寬度 */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .section {
+                padding: 15px; /* 減小 section 的填充 */
+            }
+        
+            h3 {
+                font-size: 14px; /* 調整標題字體大小 */
+            }
+        
+            button {
+                font-size: 12px; /* 減小按鈕字體大小 */
+            }
+        }
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+            }
+        
+            /* 修改圖示排列方式 */
+            .icons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        
+            .icons a:first-child {
+                margin-left: 0; /* 保證左邊的圖示貼齊 */
+            }
+        
+            .icons a:last-child {
+                margin-right: 0; /* 保證右邊的圖示貼齊 */
+            }
+        
+        @media screen and (max-width: 768px) {
+                .products {
+                    grid-template-columns: 1fr;
+                }
+            
+            
+                nav ul {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            
+                nav ul li {
+                    margin: 10px 0;
+                }
+            
+                .menu-icon {
+                    display: block;
+                }
+            
+                .header-container {
+                    flex-direction: column;
+                }
+            
+                .icons {
+                    justify-content: space-between;
+                    width: 100%;
+                }
+            
+            }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/logo_home.png') }}" alt="Tea Lounge Logo" class="logo"></a>
+            </div>
+            <div class="icons">
+                <a href="{{ url_for('cart') }}" class="cart-icon">
+                    <img src="{{ url_for('static', filename='images/cart.png') }}" alt="Cart Icon">
+                    <span class="cart-badge" id="cart-count"></span>
+                </a>
+                {% if current_user.is_authenticated %}
+                <a onclick="toggleUserPopup()"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+                {% else %}
+                <a href="/login"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- 用戶彈出框 -->
+    <div id="userPopup" class="user-popup" style="display: none;">
+        <a href="/member">會員資料</a>
+        <a href="/order">訂單查詢</a>
+        <hr>
+        <form action="{{ url_for('logout') }}" method="post">
+            <button type="submit" class="btn">登出</button>
+        </form>        
+    </div>
+   
+    <!-- 錯誤模態框 -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">錯誤</span>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                 <button id="closeErrorModal">確定</button>
+            </div>
+        </div>
+    </div>
+   
+    <!-- 成功模態框 -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">成功</span>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="confirmSubmit">確定</button>
+            </div>
+        </div>
+    </div>
+   
+    <!-- 確認模態框 -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">確認</span>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="confirmSubmit">確定</button>
+                <button id="cancelSubmit">取消</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="form-title">訂單資料</div>
+
+        <div class="section cart-info">
+            <ul id="cart-items" class="cart-items">
+                {% if cart_items %}
+                    {% for item in cart_items %}
+                        <li>
+                            <p>產品名稱: {{ item.product.ProductName }}</p>
+                            <p>數量: {{ item.CartItem.quantity }}</p>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>購物車目前沒有商品</li>
+                {% endif %}
+            </ul>
+        </div>
+       
+        <div class="bottom-sections">
+            <div class="section pricing-info">
+                <div class="row">
+                    <span>商品小計</span>
+                    <span>${{ subtotal }}</span>
+                </div>
+                <div class="row">
+                    <span>運費</span>
+                    <span>${{ shipping_fee }}</span>
+                </div>
+                <div class="row total">
+                    <span>結帳總額</span>
+                    <span>${{ total }}</span>
+                </div>
+            </div>
+       
+            <div class="section payment-info">
+                <h3>運送方式</h3>
+                <label>
+                    <input type="checkbox" id="deliveryCheckbox" onclick="toggleDeliveryInfo()"> 宅配
+                </label>
+                <div class="bank-details">
+                    <div class="row">
+                        <span>匯款帳號</span>
+                        <span>(807) 234665789225</span>
+                    </div>
+                    <div class="row">
+                        <span>帳號末五碼</span>
+                        <input type="text" id="remittanceCode" name="remittanceCode" placeholder="輸入帳號末五碼" maxlength="5" required>
+                    </div>
+                </div>
+            </div>
+       
+            <!-- 新增：宅配資料表單 -->
+            <div id="deliveryInfo" class="section delivery-info">
+                <h3>宅配資料</h3>
+                <label>信箱（非必填）</label>
+                <input type="text" id="email" placeholder="請輸入信箱">
+                <label>收件人姓名</label>
+                <input type="text" id="recipientName" placeholder="請輸入收件人姓名">
+                <span class="error" id="recipientNameError">請填寫收件人姓名</span>
+                <label>收件人電話</label>
+                <input type="text" id="phoneNumber" placeholder="請輸入連絡電話">
+                <span class="error" id="phoneNumberError">請填寫收件人電話</span>
+                <label>收件地址</label>
+                <input type="text" id="address" placeholder="請輸入收件地址">
+                <span class="error" id="addressError">請填寫收件地址</span>
+            </div>
+        </div>
+
+
+        <p class="instructions">
+            (請確認匯款成功後，並填寫帳號末五碼，再送出訂單，謝謝！)
+        </p>
+        <div class="submit-section">
+            <button type="submit" onclick="confirmSubmit()">提交訂單</button>
+        </div>
+    </div>
+   
+    <a id="hiddenLink" href="/home" style="display: none;"></a>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h2>Tea Lounge</h2>
+                <h3>聯絡資訊</h3>
+                <h4>
+                    客服專線：0981-509-558<br>
+                    信箱：rcdesign03@gmail.com
+                </h4>
+            </div>
+            <div class="footer-links">
+                <a href="https://www.facebook.com/teacafelounge"><img src="static/images/FB.png" alt="Facebook Icon"></a>
+                <a href="https://www.instagram.com/food.is.shiny?igsh=MXZ5anJ2cmx1aHZlbw=="><img src="static/images/IG.png" alt="Instagram Icon"></a>
+                <a href="https://lin.ee/f2KTSUE"><img src="static/images/LINE.png" alt="LINE Icon"></a>
+            </div>
+        </div>
+        <p>©Tea Lounge 時尚品茶餐飲</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var customerName = "{{ customer_name }}";
+            var customerPhone = "{{ customer_phone }}";
+            var customerEmail = "{{ customer_email }}";
+        
+            document.getElementById('recipientName').value = customerName;
+            document.getElementById('phoneNumber').value = customerPhone;
+            document.getElementById('email').value = customerEmail;
+        
+            console.log("Customer Name:", customerName);
+            console.log("Customer Phone:", customerPhone);
+            console.log("Customer Email:", customerEmail);
+        
+            var cartItems = {{ cart_items|tojson }};
+            console.log(cartItems);
+        
+            var cartItemsContainer = document.getElementById('cart-items');
+            if (cartItemsContainer) {
+                cartItemsContainer.innerHTML = '';
+                cartItems.forEach(item => {
+                    var cartItemLi = document.createElement('li');
+                    cartItemLi.className = 'cart-item';
+                    cartItemLi.innerHTML = `
+                        <p>產品名稱: ${item.product.ProductName}</p>
+                        <p>數量: ${item.CartItem.quantity}</p>
+                    `;
+                    cartItemsContainer.appendChild(cartItemLi);
+                });
+            } else {
+                console.error('Cart items container not found');
+            }
+        
+            // 檢查 localStorage 是否有未提交的表單資料
+            const savedData = localStorage.getItem('unsavedFormData');
+            if (savedData) {
+                if (confirm('您有未提交的表單，是否要繼續編輯？')) {
+                    const formData = JSON.parse(savedData);
+                    for (let key in formData) {
+                        if (formData.hasOwnProperty(key)) {
+                            document.querySelector(`[name="${key}"]`).value = formData[key];
+                        }
+                    }
+                } else {
+                    // 清空購物車
+                    clearCart();
+                    localStorage.removeItem('unsavedFormData');
+                }
+            }
+        
+            // 當表單有變更時保存資料
+            document.getElementById('form').addEventListener('input', function() {
+                const formData = new FormData(document.getElementById('form'));
+                let dataToStore = {};
+                formData.forEach((value, key) => {
+                    dataToStore[key] = value;
+                });
+                localStorage.setItem('unsavedFormData', JSON.stringify(dataToStore));
+            });
+        });
+        
+        function clearCart() {
+            fetch('/clear_cart', {
+                method: 'POST',
+                credentials: 'include'
+            }).then(response => {
+                if (response.ok) {
+                    console.log('購物車已清空');
+                }
+            });
+        }
+        
+        function toggleUserPopup() {
+            var popup = document.getElementById('userPopup');
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        }
+        
+        function logout() {
+            window.location.href = '/logout';
+        }
+        
+        function toggleDeliveryInfo() {
+            var checkbox = document.getElementById('deliveryCheckbox');
+            var deliveryInfo = document.getElementById('deliveryInfo');
+            deliveryInfo.style.display = checkbox.checked ? 'block' : 'none';
+        }
+        
+        function validateForm() {
+            var recipientName = document.getElementById('recipientName');
+            var phoneNumber = document.getElementById('phoneNumber');
+            var address = document.getElementById('address');
+            var remittanceCode = document.getElementById('remittanceCode');
+        
+            var recipientNameError = document.getElementById('recipientNameError');
+            var phoneNumberError = document.getElementById('phoneNumberError');
+            var addressError = document.getElementById('addressError');
+        
+            var valid = true;
+        
+            // 驗證收件人姓名
+            if (recipientName.value.trim() === '') {
+                recipientNameError.style.display = 'block';
+                valid = false;
+            } else {
+                recipientNameError.style.display = 'none';
+            }
+        
+            // 驗證電話號碼
+            if (phoneNumber.value.trim() === '') {
+                phoneNumberError.style.display = 'block';
+                phoneNumberError.textContent = '請填寫電話號碼';
+                valid = false;
+            } else if (phoneNumber.value.trim().length !== 10) {
+                phoneNumberError.style.display = 'block';
+                phoneNumberError.textContent = '電話號碼必須為 10 位數';
+                valid = false;
+            } else {
+                phoneNumberError.style.display = 'none';
+            }
+        
+            // 驗證地址
+            if (address.value.trim() === '') {
+                addressError.style.display = 'block';
+                valid = false;
+            } else {
+                addressError.style.display = 'none';
+            }
+        
+            // 驗證匯款代碼
+            if (remittanceCode && remittanceCode.value.trim().length !== 5) {
+                showErrorModal('請輸入有效的帳號末五碼');
+                valid = false;
+            }
+        
+            return valid;
+        }
+        
+        function confirmSubmit() {
+            if (validateForm()) {
+                showConfirmModal("您確定要提交訂單嗎？", function() {
+                    var cartItems = {{ cart_items|tojson }};
+                   
+                    // 從表單中讀取數據
+                    var shippingAddress = document.getElementById('address').value;
+                    var receiverName = document.getElementById('recipientName').value;
+                    var receiverPhone = document.getElementById('phoneNumber').value;
+                    var remittanceCode = document.getElementById('remittanceCode').value;
+                   
+                    // 客戶信箱留空
+                    var customerEmail = '';
+        
+                    // 獲取所有產品編號
+                    var productIDs = cartItems.map(item => item.product.ProductID);
+                   
+                    // 向後端請求圖片路徑
+                    fetch('/get_product_images', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ product_ids: productIDs }),
+                    })
+                    .then(response => response.json())
+                    .then(imagePaths => {
+                        // 格式化購物車項目，並添加圖片路徑
+                        var formattedCartItems = cartItems.map(item => ({
+                            CartItem: {
+                                id: item.CartItem.id,
+                                quantity: item.CartItem.quantity
+                            },
+                            product: {
+                                ProductID: item.product.ProductID,
+                                ProductName: item.product.ProductName,
+                                Price: item.product.Price,
+                                ImagePath: imagePaths[item.product.ProductID] || ''  // 確保圖片路徑存在
+                            }
+                        }));
+                   
+                        var orderData = {
+                            shippingAddress: shippingAddress,
+                            receiverName: receiverName,
+                            receiverPhone: receiverPhone,
+                            remittanceCode: remittanceCode,
+                            customerEmail: customerEmail, // 客戶信箱留空
+                            cartItems: formattedCartItems
+                        };
+                   
+                        fetch('/submit_order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(orderData),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showSuccessModal("訂單已提交成功！");
+                                setTimeout(() => window.location.href = '/home', 2000);
+                            } else {
+                                showErrorModal("提交訂單失敗，請稍後再試。");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showErrorModal("提交訂單時發生錯誤。");
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorModal("獲取產品圖片路徑時發生錯誤。");
+                    });
+                }, function() {
+                    showErrorModal('您可以繼續編輯訂單。');
+                });
+            } else {
+                showErrorModal('請填寫所有必填項目！');
+            }
+        }
+        
+        function showErrorModal(message) {
+            var modal = document.getElementById('error-modal');
+            modal.querySelector('.modal-body').textContent = message;
+            modal.style.display = 'block';
+           
+            // 獲取模態框的確定按鈕
+            var closeButton = modal.querySelector('.modal-footer button');
+           
+            // 綁定按鈕點擊事件，隱藏模態框
+            closeButton.onclick = function() {
+                modal.style.display = 'none';
+            };
+        }
+        
+        function showSuccessModal(message) {
+            var modal = document.getElementById('success-modal');
+            modal.querySelector('.modal-body').textContent = message;
+            modal.style.display = 'block';
+        }
+        
+        function showConfirmModal(message, onConfirm, onCancel) {
+            var modal = document.getElementById('confirm-modal');
+            modal.querySelector('.modal-body').textContent = message;
+            modal.style.display = 'block';
+           
+            modal.querySelector('#confirmSubmit').onclick = function() {
+                modal.style.display = 'none';
+                onConfirm();
+            };
+           
+            modal.querySelector('#cancelSubmit').onclick = function() {
+                modal.style.display = 'none';
+                if (onCancel) onCancel();
+            };
+        }
+
+        
+        // 檢查 localStorage 是否有未提交的表單資料
+        const savedData = localStorage.getItem('unsavedFormData');
+        if (savedData) {
+            if (confirm('您有未提交的表單，是否要繼續編輯？')) {
+                const formData = JSON.parse(savedData);
+                for (let key in formData) {
+                    if (formData.hasOwnProperty(key)) {
+                        document.querySelector(`[name="${key}"]`).value = formData[key];
+                    }
+                }
+            } else {
+                // 清空購物車
+                clearCart();
+                localStorage.removeItem('unsavedFormData');
+            }
+        }
+        
+        // 當表單有變更時保存資料
+        document.getElementById('form').addEventListener('input', function() {
+            const formData = new FormData(document.getElementById('form'));
+            let dataToStore = {};
+            formData.forEach((value, key) => {
+                dataToStore[key] = value;
+            });
+            localStorage.setItem('unsavedFormData', JSON.stringify(dataToStore));
+        });
+
+
+    </script>
+
+
+
+</body>
+</html>

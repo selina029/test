@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品設定</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    button {
+        cursor: pointer;
+        background-color: unset;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 5px 10px;
+    }    
+    a,
+    button,
+    p,
+    span {
+      text-decoration: none;
+      color: rgb(70, 70, 70);
+      font-size: 1rem;
+    }
+    
+    button {
+      cursor: pointer;
+    }
+    
+    html,
+    body {
+      background-color: rgb(250, 250, 250);
+      color: rgb(70, 70, 70);
+      font-family: "Microsoft JhengHei";
+      font-size: 1rem;
+    }
+    #_main_menu {
+      width: 200px;
+      background-color: #40698b;
+      height: 100vh; /* 讓側邊欄覆蓋整個視口高度 */
+      box-shadow: 2px 0px 8px 0 rgba(0, 0, 0, 0.04);
+      position: fixed;
+      top: 0; /* 從視口的最上面開始 */
+      left: 0;
+      z-index: 1000; /* 確保側邊欄層級高於頂部選單 */
+    }
+    #_main_menu.active {
+        left: 0; /* 顯示側邊選單 */
+    }
+    #_main_menu ul {
+      margin: 0 15px;
+      padding-top: 30px;
+      list-style-type: none;
+    }
+
+    #_main_menu ul li {
+      padding: 0 15px;
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+    }
+
+    #_main_menu ul li a {
+      color: white;
+      display: block;
+      padding: 10px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    #_main_menu ul li a:hover {
+      background-color: #305c7c;
+    }
+
+    @media (min-width: 1024px) {
+      #_top_menu #_container {
+        padding-left: 200px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      ._top_menu ._container .content {
+        justify-content: space-between;
+      }
+    }
+    ._top_menu ._container .content .items {
+      margin: 0 5px;
+    }
+    ._top_menu ._container .content .menu {
+      font-size: 18pt;
+    }
+    @media (min-width: 1024px) {
+      ._top_menu ._container .content .menu {
+        display: none;
+      }
+    }
+    
+    #productContent img {
+      max-width: 75px;
+    }
+    #productContent .row {
+      word-break: break-all;
+    }
+    #productContent .row .th {
+      padding: 15px;
+    }
+    #productContent #_product_detail .sale {
+      color: #977245;
+      font-weight: bold;
+    }
+    #productContent #_product_detail .stop {
+      color: rgb(170, 170, 170);
+    }
+    #productContent #_product_detail .btn div {
+      width: 100%;
+    }
+    #productContent #_product_detail .btn button.light {
+      background-color: #3974a5;
+      color: white;
+    }
+    #productContent #_product_detail .btn button,
+    #productContent #_product_detail .btn a {
+      border: 1px solid gainsboro;
+      padding: 5px;
+      border-radius: 4px;
+      width: 100%;
+      display: block;
+      text-align: center;
+      margin: 4px 0;
+    }
+    #_top_menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 500;
+    }
+
+    #_top_menu ._container {
+      width: 100%;
+      min-height: 50px;
+      background-color: white;
+      display: flex;
+      justify-content: flex-end;
+      position: relative; /* 讓三條線按鈕能相對於這個容器定位 */
+    
+    }
+
+    .openbtn {
+        font-size: 20px;
+        cursor: pointer;
+        background-color: #40698b; /* 按鈕背景色 */
+        color: white; /* 按鈕文字顏色 */
+        padding: 10px 15px;
+        border: none;
+        position: absolute;
+        left: 15px; /* 距離左邊 15px */
+        top: 50%; /* 垂直置中 */
+        transform: translateY(-50%); /* 垂直置中對齊 */
+        z-index: 1100; /* 確保按鈕在頂部選單之上 */
+        display: none; /* 默認不顯示 */
+    }
+
+    #_top_menu ._container .content {
+      padding: 0 15px;
+      min-height: 50px;
+      box-shadow: 10px 2px 8px 0 rgba(0, 0, 0, 0.06);
+      margin-left: auto;
+      align-items: center;
+      justify-content: end;
+    }
+
+    #_main_inner {
+      position: absolute;
+      width: 100%;
+    }      
+    /* 上架/下架按鈕 */
+    .toggle-status-btn {
+      background-color: #a5d6a7; /* 淺綠色 */
+      color: white;
+      border: 1px solid #a5d6a7; /* 搜尋按鈕邊框顏色 */
+      border-radius: 6px; /* 搜尋按鈕圓角 */
+      padding: 8px 16px; /* 搜尋按鈕內邊距 */
+      cursor: pointer; /* 搜尋按鈕游標 */
+      font-size: 0.9rem; /* 搜尋按鈕文字大小 */
+      transition: background-color 0.3s, border-color 0.3s; /* 搜尋按鈕過渡效果 */
+      font-weight: bold; 
+    }
+
+    .toggle-status-btn:hover {
+      background-color: #81c784; /* 深綠色 */
+    }
+
+    /* 可訂購/不可訂購按鈕 */
+    .toggle-availability-btn {
+      background-color: #d6a97a; /* 淺棕色 */
+      color: white;
+      border: 1px solid #d6a97a; 
+      border-radius: 6px; 
+      padding: 8px 16px; 
+      cursor: pointer; 
+      font-size: 0.9rem;
+      transition: background-color 0.3s, border-color 0.3s; 
+      font-weight: bold; 
+    }
+
+    .toggle-availability-btn:hover {
+      background-color: #b5895d; /* 深棕色 */
+    }
+    .status-column {
+      color: #977245;
+      font-weight: bold;
+    }
+    .row img.out-of-stock {
+      opacity: 0.5; /* 當商品售完時，圖片顯示為半透明 */
+    }
+    .row.title {
+        font-weight: 700;
+    }
+    .row {
+        display: flex;
+        justify-content: left;
+        border-bottom: 1px solid rgb(215, 215, 215);
+    }
+    .row.title p {
+      color: #606060;
+    }
+    .row .th,
+    .row .td {
+      padding: 10px 5px;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+    }
+    .row .th.center,
+    .row .td.center {
+      justify-content: center;
+    }
+    .row .th:first-child,
+    .row .td:first-child {
+      padding-left: 15px;
+    }
+    .row .th:last-child,
+    .row .td:last-child {
+      padding-right: 15px;
+    }
+    
+    ._scroll_container {
+      overflow-x: auto;
+      border-radius: 6px 6px 0 0;
+      display: flex;
+      flex-flow: column nowrap;
+      font-size: 85%;
+      background-color: white;
+      width: 100%;
+    }
+    ._scroll_container ._scroll {
+      width: 100%;
+      min-width: 1400px;
+      margin-bottom: 30px;
+      padding: 0 15px;
+    }
+    
+    .pagination {
+      border-radius: 8px 8px 0 0;
+      max-width: 1400px;
+      width: calc(100% - 30px);
+      font-size: 1em;
+      margin: 15px;
+      text-align: center;
+    }
+    
+    .pagination ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .pagination ul li {
+      cursor: pointer;
+      margin: 5px;
+      display: inline-flex;
+    }
+    
+    .pagination ul li.current {
+      color: #3974a5;
+      font-weight: bold;
+    }
+    
+    .pagination ul li a {
+      text-decoration: none;
+      color: inherit; /* 確保文字顏色繼承父元素 */
+      padding: 5px 10px; /* 增加按鈕內邊距 */
+    }
+    
+    .pagination ul li a:hover {
+      background-color: #f0f0f0; /* 增加滑鼠懸停效果 */
+      border-radius: 4px; /* 增加圓角 */
+    }
+
+    #_navigation ._navigation {
+      display: flex;
+      align-items: center;
+      padding: 0 30px;
+      border-bottom: 1px solid rgb(215, 215, 215);
+      background-color: white;
+      height: 60px;
+    }
+    
+    #top_table_info {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        -moz-column-gap: 10px;
+        column-gap: 10px;
+    }
+    #top_table_info .logout-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+    }
+
+    #top_table_info #search .content {
+      width: calc(100% - 180px);
+    }
+    #top_table_info #search .content button {
+      white-space: nowrap;
+      background-color: white;
+      border-radius: 0;
+      border-left: unset !important;
+    }
+    #top_table_info input {
+      outline: unset;
+      border-left: unset !important;
+      padding-right: 15px;
+      padding-left: 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #top_table_info select {
+      cursor: pointer;
+      padding-left: 8px;
+      padding-right: 5px;
+    }
+    #top_table_info select,
+    #top_table_info input,
+    #top_table_info button {
+      height: 42px;
+      outline: unset;
+      border: 1px solid rgb(215, 215, 215);
+      font-size: 1rem;
+    }
+    #top_table_info select option,
+    #top_table_info input option,
+    #top_table_info button option {
+      border: unset;
+      padding: 0;
+    }
+    #top_table_info .controller_container {
+        display: flex;
+        justify-content: flex-end;
+    }
+    #top_table_info #search form {
+        display: flex;
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* RWD - 手機版設定 */
+    @media screen and (max-width: 768px) {
+        #top_table_info {
+            grid-template-columns: 1fr; /* 改為單列顯示 */
+            row-gap: 10px; /* 調整垂直間距 */
+        }
+    
+        #top_table_info .logout-btn {
+            padding: 6px 12px; /* 調整按鈕大小 */
+        }
+    
+        #top_table_info #search .content {
+            width: 100%; /* 調整為全寬 */
+        }
+    
+        #top_table_info input,
+        #top_table_info select,
+        #top_table_info button {
+            height: 36px; /* 縮小高度 */
+            font-size: 0.9rem; /* 縮小字體 */
+        }
+    
+        #top_table_info .controller_container {
+            justify-content: center; /* 手機版居中顯示 */
+        }
+    }
+    .classic_btn a {
+        background-color: #3974a5;
+        word-break: keep-all;
+        padding: 5px 17px;
+        color: white;
+        display: flex;
+        align-items: center;
+    
+    }
+    #main .container {
+      margin: 20px;
+      padding-top: 20px;
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+    
+    .content_box {
+      margin: 20px;
+      padding: 20px;
+      background-color: white;
+    }
+    
+    .overflow-y-hidden {
+      overflow-y: hidden;
+    }
+    .overflow-y-hidden .y-scroll {
+      overflow-y: auto;
+    }
+    
+    .overflow-x-hidden {
+      overflow-x: hidden;
+    }
+    .overflow-x-hidden .x-scroll {
+      overflow-x: auto;
+    }
+    .w10 {
+      width: 10%;
+    }
+    .w30 {
+      width: 30%;
+    }  
+    .w15 {
+      width: 15%;
+    }
+
+    .pr-10 {
+      padding-right: 10px;
+    }
+    .pl-10 {
+      padding-left: 10px;
+    }
+    .mt-20 {
+        margin-top: 20px;
+    }
+    .linka,
+    .link a {
+      color: #506c97;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .flex-warp {
+      flex-wrap: wrap;
+    }
+    
+    .item-center {
+      align-items: center;
+    }
+    
+    .between {
+      justify-content: space-between;
+    }
+    
+    ._left,
+    ._right {
+      width: 50%;
+    }    
+    #_main_content {
+      margin-left: 200px; /* 側邊欄的寬度 */
+      margin-top: 50px; /* 顯示頂部選單 */
+      padding: 15px;
+      flex: 1;
+      background-color: white;
+      height: calc(100vh - 50px); /* 高度為整個視口高度減去頂部選單高度 */
+      overflow-y: auto;
+    }
+    
+    #_main_content .container {
+      width: calc(100% - 30px);
+      margin: 15px auto 0 auto;
+      border-radius: 10px 10px 0 0;
+      background-color: white;
+      padding: 15px 15px 80px;
+    }
+
+    .border {
+      border: 1px solid rgb(215, 215, 215); /* 邊框顏色 */
+    }
+    /* 手機視圖下隱藏側邊欄預留空間 */
+    @media (max-width: 1024px) {
+        .openbtn {
+            display: block; /* 顯示三條線按鈕 */
+        }
+        #_main_menu {
+          left: -200px;
+          transition: left 0.3s;
+        }
+    
+        #_main_menu.active {
+            left: 0; /* 顯示側邊選單 */
+        }
+    
+        #_main_content {
+            margin-left: 0; /* 移除側邊欄預留空間 */
+        }
+    }
+  </style>
+</head>
+<body>
+  <div id="_top_menu">
+    <div class="_container">
+      <button class="openbtn" onclick="toggleMenu()">☰</button>
+      <span class="admin-info">{{ session['username'] if session.get('username') else '管理者帳號' }}</span>
+      <a href="{{ url_for('manager_logout') }}">
+        <button class="logout-btn">登出</button>
+      </a>
+    </div>
+  </div>
+    
+    <div class="flex overflow-y-hidden">
+        <div id="main">
+            <div id="_main_menu">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">首頁</a></li>
+                    <li><a href="{{ url_for('orders') }}">訂單管理</a></li>
+                    <li><a href="{{ url_for('products') }}">商品設定</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>        
+    <div id="_main_content" class="y-scroll">
+        <div class="_main_inner">
+            <div id="_navigation"></div>
+            <main class="container border">
+                <section id="top_table_info" class="flex">
+                    <div id="search" class="flex text-center w-full">
+                        <div class="flex content">
+                            <form method="POST">
+                                <select id="search_target" name="search_target">
+                                    <option value="name">搜尋商品名稱</option>
+                                    <option value="showWeb">搜尋商品已上架</option>
+                                    <option value="availability">搜尋團購可訂購</option>
+                                </select>
+                                <input id="search_order" type="text" name="search_value" placeholder="..." />
+                                <button id="search_btn" class="pr-10 pl-10" type="submit">搜尋</button>
+                            </form>
+                            <div id="add_new_product" class="classic_btn controller_container">
+                                <a href="{{ url_for('add_product') }}">新增</a>
+                            </div>  
+                        </div> 
+                    </div>
+                </section> 
+            
+                <section class="mt-20">
+                    <div id="productContent" class="border _scroll_container">
+                        <div class="_scroll">
+                            <div class="row title">
+                                <div class="th w10"><p>圖片</p></div>
+                                <div class="th w10"><p>價格</p></div>
+                                <div class="th w10"><p>數量</p></div>
+                                <div class="th w30"><p>商品名稱</p></div>
+                                <div class="th w10"><p>產品狀態</p></div>
+                                <div class="th w10"><p>團購狀態</p></div>
+                                <div class="th w15"></div>
+                            </div>
+                            <div id="_product_detail" class="items">
+                                {% for product in products %}
+                                <div class="row">
+                                    <div class="th w10">
+                                        <a href="{{ url_for('product_edit', product_id=product.ProductID) }}">
+                                            <div class="out-of-stock-container">
+                                                {% if product.images and product.images|length > 0 %}
+                                                    <img src="{{ url_for('static', filename='uploads/' + product.images[0].ImagePath) }}" alt="product image" loading="lazy" class="{{ 'out-of-stock' if not product.is_available }}">
+                                                {% else %}
+                                                    <img src="{{ url_for('static', filename='uploads/default_image.jpg') }}" alt="no image available" loading="lazy">
+                                                {% endif %}
+                                                {% if not product.is_available %}
+                                                    <div class="out-of-stock-label">售完</div>
+                                                {% endif %}
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="th w10">{{ product.Price }}</div>
+                                    <div class="th w10">{{ product.Quantity }}</div>
+                                    <div class="th w30">{{ product.ProductName }}</div>
+                                    <div class="th w10 status-column">
+                                        {{ '上架' if product.Status else '下架' }}
+                                    </div>
+                                    <div class="th w10 status-column">
+                                        {{ '可訂購' if product.is_available else '不可訂購' }}
+                                    </div>
+                                    <div class="th w15">
+                                        <button class="light toggle-status-btn" data-product-id="{{ product.ProductID }}">{{ '下架' if product.Status else '上架' }}</button>
+                                        <button class="light toggle-availability-btn" data-product-id="{{ product.ProductID }}">{{ '不可訂購' if product.is_available else '可訂購' }}</button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pagination">
+                        <ul>
+                            {% if pagination %}
+                                {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=3, right_current=3) %}
+                                    {% if page_num %}
+                                        <li class="{{ 'current' if page_num == pagination.page }}">
+                                            <a href="{{ url_for('products', page=page_num, search_target=search_target, search_value=search_value) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="disabled"><span>…</span></li>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </section>
+            </main>
+        </div> 
+    </div> 
+      <script type="module">
+    document.querySelector(".openbtn").addEventListener("click", function () {
+      var menu = document.getElementById("_main_menu");
+      menu.classList.toggle("active");
+    });
+
+    // 點擊側邊欄以外的區域將側邊欄隱藏
+    document.addEventListener("click", function (event) {
+      var menu = document.getElementById("_main_menu");
+      var openBtn = document.querySelector(".openbtn");
+
+      // 如果點擊的不是側邊欄或者三條線按鈕，隱藏側邊欄
+      if (!menu.contains(event.target) && !openBtn.contains(event.target)) {
+        menu.classList.remove("active");
+      }
+    });
+
+      
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add event listeners for status toggle buttons
+      document.querySelectorAll('.toggle-status-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const productId = this.getAttribute('data-product-id');
+          toggleProductStatus(productId, this);
+        });
+      });
+
+      // Add event listeners for availability toggle buttons
+      document.querySelectorAll('.toggle-availability-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const productId = this.getAttribute('data-product-id');
+          toggleProductAvailability(productId, this);
+        });
+      });
+    });
+
+    async function toggleProductStatus(productId, button) {
+      try {
+        const response = await fetch(`/products/toggle_status/${productId}`, { method: 'POST' });
+        if (response.ok) {
+          const result = await response.json();
+    
+          // 根據新的狀態更新按鈕和顯示文本
+          const statusText = result.new_status === '上架' ? '販售中' : '下架';
+          button.innerText = result.new_status === '上架' ? '下架' : '上架';
+    
+          const statusElement = button.closest('.row').querySelector('.status-column:nth-child(5)');
+          statusElement.innerText = statusText;
+    
+          // 根據新狀態決定是否從首頁移除產品
+          if (result.new_status === '下架') {
+            const productRow = button.closest('.row'); // 獲取該產品所在的行
+            productRow.style.display = 'none'; // 隱藏該行
+          }
+        } else {
+          console.error('Failed to toggle product status:', response.status);
+        }
+      } catch (error) {
+        console.error('Error toggling product status:', error);
+      }
+    }
+
+    
+    async function toggleProductAvailability(productId, button) {
+      try {
+        const response = await fetch(`/products/toggle_availability/${productId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId })
+        });
+    
+        if (response.ok) {
+          const result = await response.json();
+          const availabilityText = result.is_available ? '可訂購' : '不可訂購';
+          button.innerText = availabilityText === '可訂購' ? '不可訂購' : '可訂購';
+    
+          const statusElement = button.closest('.row').querySelector('.status-column:nth-child(6)');
+          statusElement.innerText = availabilityText;
+    
+          const img = button.closest('.row').querySelector('img');
+          if (result.is_available) {
+            img.classList.remove('out-of-stock');
+            img.nextElementSibling?.remove();
+          } else {
+            img.classList.add('out-of-stock');
+            if (!img.nextElementSibling || !img.nextElementSibling.classList.contains('out-of-stock-label')) {
+              const label = document.createElement('div');
+              label.className = 'out-of-stock-label';
+              label.textContent = '售完';
+              img.parentElement.appendChild(label);
+            }
+          }
+        } else {
+          console.error('Failed to toggle product availability:', response.status);
+        }
+      } catch (error) {
+        console.error('Error toggling product availability:', error);
+      }
+    }
+
+
+  </script>
+</body>
+</html>

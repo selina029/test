@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 180px;
+            height: 70px;
+            margin-right: 20px;
+        }
+        /* Hide button in desktop */
+        .openbtn {
+            display: none;
+        }
+        
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .openbtn {
+                display: block;
+                font-size: 24px;
+                cursor: pointer;
+                background-color: #333;
+                color: white;
+                border: none;
+                padding: 10px;
+                margin-right: 10px;
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 2001; /* 保證按鈕位於最前方 */
+            }
+
+        
+            #mobileMenu {
+                position: fixed;
+                top: 0;
+                right: -250px; /* 初始隱藏 */
+                width: 250px;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9); /* 黑色半透明背景 */
+                padding-top: 60px;
+                transition: right 0.3s ease; /* 添加動畫效果 */
+                z-index: 2000; /* 確保在最上層 */
+            }
+
+            #mobileMenu ul {
+                list-style-type: none;
+                padding: 0;
+            }
+        
+            #mobileMenu ul li {
+                padding: 8px 16px;
+                text-align: left;
+            }
+        
+            #mobileMenu ul li a {
+                text-decoration: none;
+                font-size: 18px;
+                color: white;
+                display: block;
+            }
+        
+            #mobileMenu ul li a:hover {
+                background-color: #575757;
+            }
+        
+            #desktopMenu {
+                display: none; /* 隱藏桌面版導航 */
+            }
+        }
+        
+        /* 桌面版樣式 */
+        @media (min-width: 769px) {
+            .openbtn {
+                display: none; /* 桌面版隱藏按鈕 */
+            }
+        
+            #desktopMenu {
+                display: block;
+            }
+        
+            #desktopMenu ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+            }
+        
+            #desktopMenu ul li {
+                margin-right: 20px;
+            }
+        
+            #desktopMenu ul li a {
+                text-decoration: none;
+                color: #333;
+                font-size: 18px;
+            }
+        }
+        .icons a {
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        .icons img {
+            width: 24px;
+            height: 24px;
+        }
+        .cart-container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .cart-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .cart-table th, .cart-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .cart-table th {
+            background-color: #f8f8f8;
+        }
+        .cart-summary {
+            text-align: right;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .checkout-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: #4a4a4a;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .checkout-btn:hover {
+            background-color: #333;
+        }
+        footer {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-logo h2 {
+            text-align: center;
+            color: #7cbd8b;
+        }
+        .footer-links a {
+            margin-left: 20px;
+        }
+        .footer-links img {
+            width: 24px;
+            height: 24px;
+        }
+        footer h3 {
+            margin: 10px 0 0;
+            color: #6d6d6d;
+            font-size: 13px;
+            text-align: left;
+        }
+        footer h4 {
+            margin: 10px 0 0;
+            color: #838383;
+            font-size: 12px;
+            text-align: left;
+        }
+        footer p {
+            margin: 10px 0 0;
+            color: #9b9b9b;
+            font-size: 10px;
+        }
+        .user-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 150px;
+            background-color: #e1e9f4;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        /* 手機版調整 */
+        @media (max-width: 768px) { /* 根據你的設計調整這個值 */
+            .user-popup {
+                top: 110px; /* 將 top 調整到一個適合的值以避免擋住圖示 */
+                right: 20px; /* 根據需求調整 */
+                width: 150px; /* 如果需要，可以保持寬度 */
+            }
+        }
+        .user-popup a {
+            display: block;
+            color: #5E6D79;
+            text-decoration: none;
+            padding: 5px 5px;
+            text-align: center;
+
+        }
+        .user-popup a:hover {
+            background-color: #E8EAE6;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #E8EAE6;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            color: #5E6D79;
+        }
+        .btn:hover {
+            background-color: #E8EAE6;
+        }
+       
+        .icons img {
+            cursor: pointer;
+        }
+        .logout-button {
+            display: block;
+            width: 100px;
+            margin: 10px auto;
+            padding: 5px;
+            background-color: #d3d7e0;
+            color: #000;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        .quantity-btn, .delete-btn {
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+        }
+       
+        .quantity-btn {
+            background-color: #f0f0f0;
+        }
+       
+        .quantity-btn:hover {
+            background-color: #ddd;
+        }
+       
+        .delete-btn {
+            background-color: #d3d3d3; /* 淺灰色 */
+            color: #000; /* 黑色文字 */
+        }
+       
+        .delete-btn:hover {
+            background-color: #b0b0b0; /* 更深的灰色 */
+        }
+        /* Dialog styles */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .dialog {
+            background: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .dialog button {
+            padding: 10px 20px;
+            background: #596688;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .buttons button.disabled {
+            background-color: grey;
+            cursor: not-allowed;
+            pointer-events: none;
+        }  
+       
+        /* 通用模態框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+       
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+       
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+       
+        .modal-title {
+            font-size: 18px;
+            color: #333;
+        }
+       
+        .modal-body {
+            padding: 20px 0;
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+        }
+       
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+       
+        .modal-footer button {
+            background-color: #8ba083;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+       
+        .modal-footer button:hover {
+            background-color: #64745e;
+        }
+       
+        /* 確認提交按鈕 */
+        #confirmSubmit {
+            background-color: #5a9f75;
+        }
+       
+        #confirmSubmit:hover {
+            background-color: #497a5a;
+        }
+       
+        /* 取消按鈕 */
+        #cancelSubmit {
+            background-color: #e74c3c;
+        }
+       
+        #cancelSubmit:hover {
+            background-color: #c0392b;
+        }
+        /* 手機版的樣式 */
+        @media (max-width: 768px) {
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+            }
+        
+            /* 修改圖示排列方式 */
+            .icons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        
+            .icons a:first-child {
+                margin-left: 0; /* 保證左邊的圖示貼齊 */
+            }
+        
+            .icons a:last-child {
+                margin-right: 0; /* 保證右邊的圖示貼齊 */
+            }
+        
+        @media screen and (max-width: 768px) {
+                .products {
+                    grid-template-columns: 1fr;
+                }
+            
+            
+                nav ul {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            
+                nav ul li {
+                    margin: 10px 0;
+                }
+            
+                .menu-icon {
+                    display: block;
+                }
+            
+                .header-container {
+                    flex-direction: column;
+                }
+            
+                .icons {
+                    justify-content: space-between;
+                    width: 100%;
+                }
+            
+            }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/logo_home.png') }}" alt="Tea Lounge Logo" class="logo"></a>
+            </div>
+            <button class="openbtn">☰</button>
+            
+            <nav id="mobileMenu" style="display: none;">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">所有商品</a></li>
+                    <li><a href="{{ url_for('group') }}">團購專區</a></li>
+                    <li><a href="{{ url_for('about') }}">關於我們</a></li>
+                    <li><a href="{{ url_for('contact') }}">訂購須知</a></li>
+                </ul>
+            </nav>
+
+            
+            <!-- Desktop navigation -->
+            <nav id="desktopMenu">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">所有商品</a></li>
+                    <li><a href="{{ url_for('group') }}">團購專區</a></li>
+                    <li><a href="{{ url_for('about') }}">關於我們</a></li>
+                    <li><a href="{{ url_for('contact') }}">訂購須知</a></li>
+                </ul>
+            </nav>
+            <div class="icons">
+                <a href="{{ url_for('cart') }}" class="cart-icon">
+                    <img src="{{ url_for('static', filename='images/cart.png') }}" alt="Cart Icon">
+                    <span class="cart-badge" id="cart-count"></span>
+                </a>
+                {% if current_user.is_authenticated %}
+                <a onclick="toggleUserPopup()"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+            {% else %}
+                <a href="/login"><img src="{{ url_for('static', filename='images/user.png') }}" alt="User Icon"></a>
+            {% endif %}
+        </div>
+        </header>
+
+        <!-- 用戶彈出框 -->
+        <div id="userPopup" class="user-popup" style="display: none;">
+            <a href="/member">會員資料</a>
+            <a href="/order">訂單查詢</a>
+            <hr>
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit" class="btn">登出</button>
+            </form>
+        </div>
+       
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">提示</span>
+                </div>
+                <div class="modal-body" id="confirm-message"></div>
+                <div class="modal-footer">
+                    <button id="confirmSubmit">確定</button>
+                </div>
+            </div>
+        </div>
+
+       
+        <div id="confirm-cancel-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">提示</span>
+                </div>
+                <div class="modal-body" id="confirm-cancel-message"></div>
+                <div class="modal-footer">
+                    <button id="confirmCancelSubmit">確定</button> <!-- 將 ID 修改為 confirmCancelSubmit -->
+                    <button id="cancelSubmit">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-container">
+            <div class="cart-header">
+                <h2>購物車內容</h2>
+            </div>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>商品名稱</th>
+                        <th>數量</th>
+                        <th>小計</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="cartItems">
+                </tbody>
+            </table>
+        
+            <!-- 運費選項 -->
+            <div class="shipping-option">
+                <label for="shipping_option">選擇運費:</label>
+                <select name="shipping_option" id="shipping_option" onchange="updateTotal()">
+                    <option value="0">請選擇</option>
+                    <option value="100">常溫 - 100元</option>
+                    <option value="139">冷凍 - 139元</option>
+                </select>
+            </div>
+        
+            <!-- 顯示運費與總額 -->
+            <div class="cart-summary">
+                <div>
+                    <span>運費：</span>
+                    <span id="shippingCost">0</span>元
+                </div>
+                <div>
+                    <span>總額：</span>
+                    <span id="totalWithShipping"></span>元
+                </div>
+            </div>
+        </div>
+        <a href="{{ url_for('pay') }}" class="checkout-btn">立即結帳</a>
+    </div>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h2>Tea Lounge</h2>
+                <h3>聯絡資訊</h3>
+                <h4>
+                客服專線：0981-509-558<br>
+                信箱：rcdesign03@gmail.com</h4>
+            </div>
+            <div class="footer-links">
+                <a href="https://www.facebook.com/teacafelounge"><img src="{{ url_for('static', filename='images/FB.png') }}" alt="Facebook Icon"></a>
+                <a href="https://www.instagram.com/food.is.shiny?igsh=MXZ5anJ2cmx1aHZlbw=="><img src="{{ url_for('static', filename='images/IG.png') }}" alt="Instagram Icon"></a>
+                <a href="https://lin.ee/f2KTSUE"><img src="{{ url_for('static', filename='images/LINE.png') }}" alt="LINE Icon"></a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const products = {}; // 初始化產品資料物件
+        let initialCartTotal = 0; // 定義初始購物車總額
+        let shippingCost = 0; // 預設運費為 0
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCartItems(); // 載入購物車項目
+        });
+    
+        async function fetchProductData(productName) {
+            try {
+                const response = await fetch(`/get_product_by_name/${encodeURIComponent(productName)}`);
+                const data = await response.json();
+                if (data.ProductID) {
+                    products[productName] = {
+                        id: data.ProductID,
+                        price: parseFloat(data.price),
+                    };
+                    return products[productName];
+                } else {
+                    console.error('產品數據獲取失敗:', data.error);
+                }
+            } catch (error) {
+                console.error('產品數據獲取失敗:', error);
+            }
+            return null;
+        }
+    
+        function fetchCartItems() {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            updateCartDisplay(cartItems);
+        }
+    
+        function updateCartDisplay(cartItems) {
+            const cartItemsElement = document.getElementById('cartItems');
+            const cartTotalElement = document.getElementById('cartTotal');
+    
+            let cartTotal = 0;
+            cartItemsElement.innerHTML = ''; // 清除現有項目
+    
+            cartItems.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>
+                        <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                        <span id="quantity-${index}">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                    </td>
+                    <td id="subtotal-${index}">${Math.round(item.subtotal)}</td>
+                    <td><button class="delete-btn" onclick="removeItem(${index})">刪除</button></td>
+                `;
+                cartItemsElement.appendChild(row);
+                cartTotal += item.subtotal;
+            });
+    
+            initialCartTotal = cartTotal; // 設定初始總額
+            cartTotalElement.textContent = Math.round(cartTotal); // 顯示購物車的總額
+    
+            updateTotal(); // 每次顯示購物車時更新含運費的總額顯示
+        }
+    
+        function changeQuantity(index, change) {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            const item = cartItems[index];
+    
+            if (item) {
+                item.quantity += change;
+    
+                if (item.quantity <= 0) {
+                    cartItems.splice(index, 1); // 移除數量為零的項目
+                } else {
+                    if (products[item.name]) {
+                        item.subtotal = item.quantity * products[item.name].price;
+                    } else {
+                        fetchProductData(item.name).then((product) => {
+                            if (product) {
+                                item.subtotal = item.quantity * product.price;
+                                localStorage.setItem('cart', JSON.stringify(cartItems));
+                                fetchCartItems();
+                            }
+                        });
+                        return;
+                    }
+                }
+    
+                localStorage.setItem('cart', JSON.stringify(cartItems));
+                updateCartDisplay(cartItems); // 更新顯示購物車和總額
+            }
+        }
+    
+        function updateTotal() {
+            // 獲取選擇的運送選項
+            const shippingOption = document.getElementById('shipping_option').value;
+    
+            // 根據購物車總額和選擇的運送方式設定運費
+            if (initialCartTotal >= 6000) {
+                // 總額達到 6000，兩個選項運費都是 0
+                shippingCost = 0;
+            } else if (initialCartTotal >= 3000) {
+                // 總額達到 3000，但未滿 6000
+                shippingCost = (shippingOption === "100") ? 0 : 139;
+            } else {
+                // 總額未達 3000
+                shippingCost = parseInt(shippingOption) || 0;
+            }
+    
+            // 更新顯示的運費和含運費的總額
+            document.getElementById('shippingCost').textContent = Math.round(shippingCost);
+            const totalWithShipping = initialCartTotal + shippingCost;
+            document.getElementById('totalWithShipping').textContent = Math.round(totalWithShipping);
+        }
+    
+        function removeItem(index) {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            cartItems.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            fetchCartItems();
+        }
+    
+        function addItemToCart(product) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+            const existingItemIndex = cart.findIndex((item) => item.name === product.name);
+            if (existingItemIndex >= 0) {
+                cart[existingItemIndex].quantity += product.quantity;
+                cart[existingItemIndex].subtotal = cart[existingItemIndex].price * cart[existingItemIndex].quantity;
+            } else {
+                product.subtotal = product.price * product.quantity;
+                cart.push(product);
+            }
+    
+            localStorage.setItem('cart', JSON.stringify(cart));
+            fetchCartItems();
+        }
+        
+        function showConfirmModal(message, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            const messageElement = document.getElementById('confirm-message');
+            const confirmButton = document.getElementById('confirmSubmit');
+        
+            if (modal && messageElement && confirmButton) {
+                messageElement.textContent = message;
+                modal.style.display = 'block';
+        
+                confirmButton.onclick = () => {
+                    onConfirm && onConfirm();
+                    modal.style.display = 'none';
+                };
+            }
+        }
+        
+        function showConfirmCancelModal(message, onConfirm, onCancel) {
+            const modal = document.getElementById('confirm-cancel-modal');
+            const messageElement = document.getElementById('confirm-cancel-message');
+            const confirmButton = document.getElementById('confirmCancelSubmit');
+            const cancelButton = document.getElementById('cancelSubmit');
+        
+            if (modal && messageElement && confirmButton && cancelButton) {
+                messageElement.textContent = message;
+                modal.style.display = 'block';
+        
+                confirmButton.onclick = async () => {
+                    await onConfirm();
+                    modal.style.display = 'none';
+                    window.location.href = '/pay';
+                };
+        
+                cancelButton.onclick = async () => {
+                    await onCancel();
+                    modal.style.display = 'none';
+                };
+            }
+        }
+        
+        document.querySelector('.checkout-btn').addEventListener('click', async function (event) {
+            event.preventDefault();
+        
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            for (const item of cart) {
+                const product = await fetchProductData(item.name);
+                if (!product) {
+                    showConfirmModal('產品查詢失敗，請稍後再試', () => {});
+                    return;
+                }
+                item.productId = product.id;
+            }
+        
+            const checkResponse = await fetch('/checkout/check_cart_items');
+            const checkData = await checkResponse.json();
+        
+            if (checkData.has_unchecked_items) {
+                showConfirmCancelModal(
+                    '資料庫中有未結帳的購物車項目，是否先結帳這些項目？',
+                    async () => {
+                        const response = await fetch('/checkout', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ cartItems: cart }),
+                        });
+                        const data = await response.json();
+                        showConfirmModal(data.success ? '結帳成功' : `結帳失敗: ${data.message}`, () => {
+                            data.success && (localStorage.removeItem('cart'), window.location.href = '/pay');
+                        });
+                    },
+                    async () => {
+                        await fetch('/checkout/delete_unchecked_cart_items', { method: 'DELETE' });
+                        showConfirmModal('未結帳的項目已被刪除', () => window.location.href = '/cart');
+                    }
+                );
+            } else if (!cart.length) {
+                showConfirmModal('購物車為空，請添加商品後再結帳。', () => {});
+            } else {
+                const response = await fetch('/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cartItems: cart }),
+                });
+                const data = await response.json();
+                showConfirmModal(data.success ? '結帳成功' : `結帳失敗: ${data.message}`, () => {
+                    data.success && (localStorage.removeItem('cart'), window.location.href = '/pay');
+                });
+            }
+        });
+        
+        // 側邊選單控制
+        document.querySelector('.openbtn')?.addEventListener('click', toggleMenu);
+        
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.style.right = menu.style.right === '0px' ? '-250px' : '0px';
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        
+        // 切換使用者彈窗
+        function toggleUserPopup() {
+            const popup = document.getElementById('userPopup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        // 登出
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+
+    </script>
+
+</body>
+</html>
