@@ -290,7 +290,7 @@ def login_redirect():
     return redirect(url_for('manager_login'))
 
 
-def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_token):
+def upload_image_to_github(repo_owner, repo_name, file, commit_message):
     filename = secure_filename(file.filename)
     file_path = f"static/uploads/{filename}"  # 更新為 test/static/uploads
 
@@ -305,7 +305,7 @@ def upload_image_to_github(repo_owner, repo_name, file, commit_message, github_t
     }
 
     headers = {
-        "Authorization": f"token {github_token}",
+        "Authorization": "token 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",  # 直接在這裡寫入 token
         "Accept": "application/vnd.github.v3+json"
     }
 
@@ -332,20 +332,13 @@ def upload_file():
     if file and allowed_file(file.filename):
         # 使用 secure_filename 確保檔名安全
         filename = secure_filename(file.filename)
-        
-        # 從環境變數獲取 GitHub token
-        github_token = os.getenv("GITHUB_TOKEN")
-        if not github_token:
-            flash('GitHub token 未設定', 'error')
-            return redirect(request.url)
 
         # 上傳檔案到 GitHub
         github_upload_success = upload_image_to_github(
             repo_owner="selina029",
             repo_name="test",
             file=file,
-            commit_message=f"Upload {filename} to static/uploads folder",
-            github_token=github_token
+            commit_message=f"Upload {filename} to static/uploads folder"
         )
         
         if github_upload_success:
@@ -893,19 +886,13 @@ def upload_image(product_id):
     if image.filename == '':
         flash('沒有選擇圖片', 'error')
         return redirect(url_for('product_edit', product_id=product_id))
-    
-    github_token = os.getenv("GITHUB_TOKEN")
-    if not github_token:
-        flash('GitHub token 未設定', 'error')
-        return redirect(url_for('product_edit', product_id=product_id))
 
     # 上傳圖片到 GitHub
     success = upload_image_to_github(
         repo_owner="selina029",
         repo_name="test",
         file=image,
-        commit_message=f"Upload {image.filename} to test/static/uploads",
-        github_token=github_token
+        commit_message=f"Upload {image.filename} to test/static/uploads"
     )
     
     if success:
@@ -914,7 +901,6 @@ def upload_image(product_id):
         flash('圖片上傳到 GitHub 失敗', 'error')
     
     return redirect(url_for('product_edit', product_id=product_id))
-
 
 @app.route('/products/toggle_status/<int:product_id>', methods=['POST'])
 def toggle_status(product_id):
@@ -942,11 +928,11 @@ def product_edit(product_id):
     images = ProductImage.query.filter_by(ProductID=product_id).all()
     return render_template('product_edit.html', product=product, images=images)
 
-def delete_image_from_github(repo_owner, repo_name, file_path, commit_message, github_token):
+def delete_image_from_github(repo_owner, repo_name, file_path, commit_message):
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
 
     headers = {
-        "Authorization": f"token {github_token}",
+        "Authorization": "token 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",  # 直接在這裡寫入 token
         "Accept": "application/vnd.github.v3+json"
     }
 
@@ -977,19 +963,13 @@ def delete_image(image_id):
     if image is None:
         flash('圖片未找到', 'error')
         return redirect(url_for('product_edit', product_id=image.ProductID))
-    
-    github_token = os.getenv("GITHUB_TOKEN")
-    if not github_token:
-        flash('GitHub token 未設定', 'error')
-        return redirect(url_for('product_edit', product_id=image.ProductID))
 
     # 刪除圖片檔案
     success = delete_image_from_github(
         repo_owner="selina029",
         repo_name="test",
         file_path=f"static/uploads/{image.ImagePath}",
-        commit_message=f"Delete {image.ImagePath} from test/static/uploads",
-        github_token=github_token
+        commit_message=f"Delete {image.ImagePath} from test/static/uploads"
     )
     
     if success:
@@ -1000,7 +980,7 @@ def delete_image(image_id):
         flash('圖片刪除失敗', 'error')
     
     return redirect(url_for('product_edit', product_id=image.ProductID))
-
+    
 @app.route('/notify_homepage', methods=['POST'])
 def notify_homepage():
     try:
