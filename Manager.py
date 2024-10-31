@@ -336,7 +336,7 @@ def upload_file():
         # 上傳檔案到 GitHub
         github_upload_success = upload_image_to_github(
             repo_owner="selina029",
-            repo_name="Tealounge",
+            repo_name="test",
             file=file,
             commit_message=f"Upload {file.filename} to Tealounge static folder",
             github_token=github_token
