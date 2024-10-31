@@ -892,20 +892,33 @@ def upload_image(product_id):
     
     try:
         filename = secure_filename(image.filename)
-        image_path = os.path.join('static/uploads/', filename)
-        image.save(image_path)
         
-        # 創建新的圖片記錄
-        new_image = ProductImage(ProductID=product.ProductID, ImagePath=filename)
-        db.session.add(new_image)
-        db.session.commit()
+        # 從環境變數獲取 GitHub token
+        github_token = os.getenv("GITHUB_TOKEN")
+
+        # 上傳圖片到 GitHub
+        github_upload_success = upload_image_to_github(
+            repo_owner="selina029",
+            repo_name="test",
+            file=image,
+            commit_message=f"Upload {filename} for product {product_id}",
+            github_token=github_token
+        )
         
-        flash('圖片上傳成功', 'success')
+        if github_upload_success:
+            # 若上傳成功，儲存資料庫記錄
+            new_image = ProductImage(ProductID=product.ProductID, ImagePath=filename)
+            db.session.add(new_image)
+            db.session.commit()
+            flash('圖片成功上傳到 GitHub', 'success')
+        else:
+            flash('圖片上傳到 GitHub 失敗', 'error')
     except Exception as e:
         db.session.rollback()
         flash(f'上傳圖片時發生錯誤: {str(e)}', 'error')
     
     return redirect(url_for('product_edit', product_id=product_id))
+
 
 @app.route('/products/toggle_status/<int:product_id>', methods=['POST'])
 def toggle_status(product_id):
@@ -933,6 +946,30 @@ def product_edit(product_id):
     images = ProductImage.query.filter_by(ProductID=product_id).all()
     return render_template('product_edit.html', product=product, images=images)
 
+def delete_image_from_github(repo_owner, repo_name, file_path, commit_message, github_token):
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+
+    # 取得檔案的 SHA 值
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()['sha']
+    else:
+        print(f"無法找到檔案 SHA: {response.status_code} - {response.text}")
+        return False
+
+    # 發送刪除請求
+    payload = {
+        "message": commit_message,
+        "sha": sha
+    }
+    delete_response = requests.delete(api_url, json=payload, headers=headers)
+
+    return delete_response.status_code == 200
+
 @app.route('/delete_image/<int:image_id>', methods=['POST'])
 def delete_image(image_id):
     # 查找指定的圖片
@@ -942,11 +979,33 @@ def delete_image(image_id):
         flash('圖片未找到', 'error')
         return redirect(url_for('product_edit', product_id=image.ProductID))  # 假設 product_edit 路由需要 product_id 參數
     
-    # 刪除圖片
-    db.session.delete(image)
-    db.session.commit()
+    try:
+        # 從環境變數獲取 GitHub token
+        github_token = os.getenv("GITHUB_TOKEN")
+
+        # 刪除圖片檔案在 GitHub 的路徑
+        file_path = f"static/uploads/{image.ImagePath}"  # 移除 Tealounge 路徑以匹配 test repo 的結構
+        
+        # 從 GitHub 刪除圖片
+        github_delete_success = delete_image_from_github(
+            repo_owner="selina029",
+            repo_name="test",
+            file_path=file_path,
+            commit_message=f"Delete {image.ImagePath} for product {image.ProductID}",
+            github_token=github_token
+        )
+        
+        if github_delete_success:
+            # 刪除資料庫中的圖片記錄
+            db.session.delete(image)
+            db.session.commit()
+            flash('圖片已成功從 GitHub 和資料庫中刪除', 'success')
+        else:
+            flash('無法從 GitHub 刪除圖片', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'刪除圖片時發生錯誤: {str(e)}', 'error')
     
-    flash('圖片已刪除', 'success')
     return redirect(url_for('product_edit', product_id=image.ProductID))
 
 @app.route('/notify_homepage', methods=['POST'])
